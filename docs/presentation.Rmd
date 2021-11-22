@@ -1,0 +1,65 @@
+---
+title: "Survey Data Analysis"
+subtitle: "Microdata in Refugee Context"
+author: ""
+institute: ""
+date: "1 December 2021"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: 16:9
+    css: ["unhcr-slides.css", "unhcr-slides-fonts.css"]
+---
+layout: true
+
+<div class="my-footer"><span></span></div> 
+
+---
+
+# Learning objectives
+
+**About today:**
+
+- What is microdata and how to use them in Forcible Displacement Statistics Context
+
+- Building indicators from Survey Data. 
+
+- Describe, Explore, Explain - the 2 steps of survey data analysis  
+
+**Not today:**
+
+- Induction Training on R language! For this head to [UNHCR Learn & Connect- R training](https://unhcr.csod.com/ui/lms-learner-playlist/PlaylistDetails?playlistId=e90e2279-e3a4-4ef2-8b74-757f91d224b2)
+
+???
+  
+
+---
+
+
+## A Vision for data analysis
+
+<span style='font-size:50px; color:grey;'>"Multi-functional teams, with strengthened data literacy, regularly conduct meaningful and documented joint data interpretation sessions to define their strategic directions based on statistical evidences"</span>
+
+---
+
+## A Theory of Change for Data analysis
+
+<span style='font-size:30px;'>Proper user of data for advocacy & programmatic decision making </span>
+
+ <span style='font-size:40px;'>&#8618;</span> Corporate __Standards__ exist to define how to encode & process household surveys dataset
+ 
+ <span style='font-size:40px;'>&#8618;</span> Field data experts are trained based on precise recipes and predefined tools at each step of the __data life cycle__
+
+ <span style='font-size:40px;'>&#8618;</span> Data are presented, discussed and linked to expert knowledge during data __interpretation__ sessions with a multi-functional team
+ 
+ <span style='font-size:40px;'>&#8618;</span> All potential valid interpretations, including diverging views, are systematically __recorded__
+ 
+ <span style='font-size:40px;'>&#8618;</span>  __Persuasive__ "Data Stories“ and Policy papers are generated
+
+
+---
+ 
