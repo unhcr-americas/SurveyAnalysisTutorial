@@ -4,7 +4,8 @@
     <title>Survey Data Analysis</title>
     <meta charset="utf-8" />
     <meta name="date" content="2021-12-01" />
-    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <script src="https://use.fontawesome.com/5235085b15.js"></script>
     <link rel="stylesheet" href="unhcr-slides.css" type="text/css" />
     <link rel="stylesheet" href="unhcr-slides-fonts.css" type="text/css" />
   </head>
@@ -13,7 +14,7 @@
 class: center, middle, inverse, title-slide
 
 # Survey Data Analysis
-## Microdata in Refugee Context
+## <code>&lt;font color=“black”, size = 30&gt;Cookbook</font></code>
 ### 
 ### 1 December 2021
 
@@ -23,51 +24,2096 @@ layout: true
 
 &lt;div class="my-footer"&gt;&lt;span&gt;&lt;/span&gt;&lt;/div&gt; 
 
+
+
+
+
+
 ---
+class: inverse, left, middle
+
+# A Vision for Data Analysis
+
+&lt;span style='font-size:50px; color:grey15;'&gt;"_Multi-functional teams, with strengthened data literacy, regularly conduct meaningful and documented joint data interpretation sessions to define their strategic directions based on statistical evidences_"&lt;/span&gt;
+
+
+???
+Slides made with Xaringan - - https://arm.rbind.io/slides/xaringan.html
+
+---
+
+# A Theory of Change for Data analysis
+
+&lt;span style='font-size:30px;'&gt;Proper use of data for advocacy &amp; programmatic decision making &lt;/span&gt;
+
+ &lt;span style='font-size:40px;'&gt;&amp;#8618;&lt;/span&gt; Corporate __Standards__ exist to define how to encode &amp; process household surveys dataset
+
+ &lt;span style='font-size:40px;'&gt;&amp;#8618;&lt;/span&gt; Field data experts are trained based on precise recipes and predefined tools at each step of the __data life cycle__
+
+
+ &lt;span style='font-size:40px;'&gt;&amp;#8618;&lt;/span&gt; Data are presented, discussed and linked to expert knowledge during data __interpretation__ sessions with a multi-functional team
+
+
+ &lt;span style='font-size:40px;'&gt;&amp;#8618;&lt;/span&gt; All potential valid interpretations, including diverging views, are systematically __recorded__
+
+ &lt;span style='font-size:40px;'&gt;&amp;#8618;&lt;/span&gt;  __Persuasive__ "Data Stories“ and Policy papers are generated
+
+---
+
+class: left, middle
 
 # Learning objectives
 
-**About today:**
+### 1. How to build charts quickly?
 
-- Understand what you can gain from analysis reproducibility. 
+### 2. How to calculate impact indicators from survey data? 
 
-- Know what the main technical requirements are to set up for their analysis to be reproducible. 
+### 3. How to answer Key Research Questions? Describe, Explore, Explain...   
 
-- Have a demonstration of a practical way to make a cake using household survey data: crunching, analysis &amp; interpretation &amp; data stories! 
 
-**Not today:**
-
-- Induction Training on R language! For this head to [UNHCR Learn &amp; Connect- R training](https://unhcr.csod.com/ui/lms-learner-playlist/PlaylistDetails?playlistId=e90e2279-e3a4-4ef2-8b74-757f91d224b2)
 
 ???
+Depending on the pace of the group, if we do not finish today we will org anise a second session 
+
+---
+
+# Webinar rules
+
+&lt;i class="fa fa-spinner fa-spin fa-fw fa-2x"&gt;&lt;/i&gt; Leverage this opportunity and make this session __lively__ - there's no stupid questions!
+
+&lt;i class="fa fa-check-square fa-fw fa-2x"&gt;&lt;/i&gt; Use the __chat__ to send your questions - we are two facilitators and one is focused on replying all questions directly in the chat while the session is on-going
+
+&lt;i class="fa fa-pencil  fa-fw fa-2x"&gt;&lt;/i&gt; No need to take notes, all the session __content__ will be shared 
+
+&lt;i class="fa fa-cog fa-fw fa-2x"&gt;&lt;/i&gt; All practical exercises are designed to get you __testing the commands__:
+
+&gt; Login on a dedicated cloud-based version of RStudio with base packages pre-installed for this session @ 
+    
+&gt; Paste the command from the chat to your online Rstudio session and check what is happening
+    
+&gt; In case it is not working as expected, share screenshot or error messages from the console in the chat
+
+
+---
+
+# Click-based Workflow...
+
+
+.pull-left[
+
+Associate data  with other tables with **ACCESS** ![](images/Logo_Microsoft_Access_2013.png)
+
+...then explore through graphs with **EXCEL** ![](images/Microsoft_Excel_2013_logo.svg.png) 
+
+...then mapping with **ArcGIS** ![](images/ArcGIS.png)
+
+]
+
+.pull-right[
+
+..then write up narratives in **WORD** ![](images/Microsoft_Word_logo.png) 
+
+... and design a full document with **INDESIGN** ![](images/Adobe_InDesign_icon.png)
+
+... or create an infographic with **ILLUSTRATOR** ![](images/Adobe_Illustrator_icon.png)
+]
+
+
+
+???
+and eventually some VBA macros 
+
+---
+
+## ... coming up with challenges! 
+
+As a coauthor/reader/peer reviewer, one would like to see the whole **research process** (_how we arrived to that conclusion_), rather than cooked manuscript with inserted tables/figures.
+
+
+.pull-left[
+
+What analysis is **behind the figure**? Did it accounts for [..._new last minute question_...] in the analysis? 
+ 
+What **dataset** (_final vs preliminary version_) was used ? Were **outliers** identified?  
+
+Oops, there is an error in the data. Can we **repeat the analysis**? And update quickly the figures, graphs and tables in the report and the presentation! 
+]
+
+.pull-right[
+&gt; This consumes time and open space for errors...
+
+![](images/exhausted.png)
+]
+
+
+???
+
+When managing numerous analysis with data that may change and in a collaborative mode, this workflow is **not** the most effective. 
+
+ *  Data are manipulated through "point-and-click" user interfaces that are not __captured__!
+ *  Data are moving from a software to another (Excel, GIS, Word...) using different __formats__! 
+ *  All results (figures, tables) are **manually** copied/pasted to the final publishing system...
+ 
+---
+
+
+# Science is '_show me_' - not '_trust me_'!
+
+### Reproducible Research Manisfesto; aka the _"Ten Commandments"_ 
+
+.pull-left[
+
+For every result, **keep track** of how it was produced
+
+**Avoid manual data manipulation** steps
+
+**Archive** the exact versions of all external programs used
+
+**Version control** all custom scripts
+
+**Record all intermediate results**, when possible in standardized formats
+]
+
+.pull-right[
+
+For analyses that include randomness, **note underlying random seeds**
+
+Always **store raw data** behind plots
+
+Generate hierarchical analysis output, allowing layers of increasing detail to be inspected
+
+Connect **textual statements** to underlying results
+
+Provide **public access** to scripts, runs, and results
+]
+
+---
+
+## Enabling a fully auditable workflow
+
+As soon as all steps (i.e. **DATA + TIDYING + MODELING + VISUALS + NARRATIVE**) are done through **series of written commands recorded in scripts**:
+
+ - when spotting error in the data, or using different dataset, one just need to adjust in the script and report will update automatically;
+ 
+ - Data manipulation becomes be *de facto* fully documented (no more manual changes in Excel);
+
+ - Analysis is self-explanatory and ready for any kind of collaborative review;
+
+ - Customization are facilitated and allow to deliver  final product  with a professional branding and styling.
+ 
+&gt; Analysis becomes streamlined and [reproducible](https://unhcr-americas.github.io/reproducibility)! 
+
+&gt; A "collaboration mode" is enabled from the begining of the process! 
+
+
+???
+ instead of **hundreds of mouse clicks**
+See also http://muschellij2.github.io/summerR_2015/modules/module12.html
+---
+
+### Key Concept 1: From "click" to "script"
+
+Using the right combination of packages, you can integrate all necessary data analysis steps into **scripts**:
+
+.pull-left[
+
+Data management (import, clean, recode, merge, reshape)
+
+Data analysis (test, regression, multivariate analysis, etc...)
+ 
+Data visualization (plot, map, graph...)
+
+Writing up results (report and presentation generation)
+
+]
+
+.pull-right[
+
+![](images/data-science-wrangle.png)
+
+]
+
+
+ 
+
+---
+
+
+### Key Concept 2: Everything is an object &amp; Anything can be packaged....
+
+
+.left-column[
+
+
+![](images/design-cake3.png)
+
+
+]
+
+.right-column[
+
+
+`Vectors` are a core single data structure, created with `c()`. 
+
+`Data.frame` where each column is a vector, but adjacent vectors can hold different things
+
+`Matrix` just like a data frame except it's all numeric
+
+`List` are made of any dimension, mix and match
+
+`Factors` are a special class that R uses for categorical variables, which also allows for value labeling and ordering.
+
+`Functions` are object designed to transform one object in a new one
+
+`Charts` are objects  designed to generate an image
+
+`Models` are objects recording computation based on specific data 
+
+]
+
+
+???
+Elements in a vector must be of the same type.
+Reference link on [Manipulating data](http://www.cookbook-r.com/Manipulating_data/)
+
+
+---
+
+
+### Key Concept 3: Search, Test, Try...
+
+.pull-left[
+
+![](images/change.png)
+]
+
+.pull-right[
+
+ Training / Certification on R language on [UNHCR Learn &amp; Connect- R training](https://unhcr.csod.com/ui/lms-learner-playlist/PlaylistDetails?playlistId=e90e2279-e3a4-4ef2-8b74-757f91d224b2) 
+
+[`UnhcrDataPackage`]() contains a library of charts
+
+stackoverflow
+
+]
+
+
+---
+class: center, middle, inverse
+
+# Practical Use Case 1 - Charting
+
+### *My boss needs a slide with the main origin of Asylum Seekers and Refugees from Americas in this country... in 5 minutes....* &lt;i class="fa fa-exclamation-circle fa-fw fa-2x"&gt;&lt;/i&gt; 
+
+
+---
+
+## How to get to the chart below?
+
+&lt;img src="presentation_files/figure-html/unnamed-chunk-1-1.png" width="80%" /&gt;
+
+???
+https://r4ds.had.co.nz/graphics-for-communication.html#figure-sizing 
+
+---
+
+### Create a project and install required packages
+
+.pull-left[
+
+```r
+library(tidyverse)
+library(scales)
+library(unhcrdatapackage)
+library(unhcRstyle)
+library(readxl)
+```
+]
+
+--
+
+.pull-right[
+
+]
+
+---
+
+### Get the data
+
+.pull-left[
+
+To get the data, multiple approach are possible:
+ * Got to HDX or Refugee Data Finder to download the data and save them locally within 
+
+
+```r
+popdata &lt;- unhcrdatapackage::end_year_population_totals
+```
+]
+
+
+--
+
+.pull-right[
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:right;"&gt; Year &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; CountryOriginCode &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; CountryAsylumCode &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; CountryOriginName &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; CountryAsylumName &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; REF &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; IDP &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; ASY &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; OOC &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; STA &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; VDA &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 1951 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; UKN &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; AUS &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Various / unknown &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Australia &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 180000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 1951 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; UKN &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; AUT &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Various / unknown &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Austria &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 282000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 1951 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; UKN &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; BEL &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Various / unknown &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Belgium &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 55000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 1951 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; UKN &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CAN &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Various / unknown &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Canada &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 168511 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 1951 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; UKN &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; DNK &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Various / unknown &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Denmark &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 1951 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; UKN &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; FRA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Various / unknown &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; France &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 290000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+
+---
+
+### Reshape the data
+
+.pull-left[
+
+```r
+int_displ &lt;- popdata %&gt;% 
+  filter(Year &gt;=2010) %&gt;% 
+  group_by(Year) %&gt;% 
+  summarise(Refugees = sum(REF, na.rm = TRUE),
+            `Asylum-seekers` = sum(ASY, na.rm = TRUE),
+            `Venezuelans displaced abroad` = sum(VDA, na.rm = TRUE)) %&gt;% 
+  pivot_longer(cols = c("Refugees", "Asylum-seekers", "Venezuelans displaced abroad"),
+               values_to = "Number of displaced", names_to = "Population type")
+```
+]
+
+--
+
+.pull-right[
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:right;"&gt; Year &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Population type &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Number of displaced &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 2010 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Refugees &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10548900 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 2010 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Asylum-seekers &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 835969 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 2010 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Venezuelans displaced abroad &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 2011 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Refugees &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10403951 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 2011 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Asylum-seekers &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 895692 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 2011 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Venezuelans displaced abroad &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+
+---
+
+### Build the chart
+
+.pull-left[
+
+```r
+*# Add data, map to the aesthetic and add a geom
+ggplot(data = int_displ) +
+  aes(x = Year, y=`Number of displaced`) +
+  geom_col()
+```
+]
+
+--
+
+.pull-right[
+&lt;img src="presentation_files/figure-html/unnamed-chunk-9-1.png" width="1800" /&gt;
+
+]
+
+---
+
+### Build the chart
+
+.pull-left[
+
+```r
+ggplot(data = int_displ) +
+  aes(x = Year, y=`Number of displaced`) +
+  geom_col() +
+* # Rotate the axis for easier comparison
+* coord_flip()
+```
+]
+
+--
+
+.pull-right[
+&lt;img src="presentation_files/figure-html/unnamed-chunk-11-1.png" width="1800" /&gt;
+]
+
+---
+
+### Build the chart
+
+.pull-left[
+
+```r
+ggplot(data = int_displ) +
+  aes(x = Year, y=`Number of displaced`) +
+  geom_col() +
+  coord_flip() + 
   
+* # Aply unhcr_theme
+* unhcr_theme()
+```
+]
+
+--
+
+.pull-right[
+&lt;img src="presentation_files/figure-html/unnamed-chunk-13-1.png" width="1800" /&gt;
+]
+
+
+---
+
+### Build the chart
+
+
+.pull-left[
+
+
+```r
+ggplot(data = int_displ) +
+  aes(x = Year, y=`Number of displaced`) +
+  geom_col() +
+  coord_flip() +
+* # Keeps major and minor X gridlines see unhcr_theme doc
+  unhcr_theme(grid = "Xx") + 
+* # Add information about the graph and define active gridline in unhcr_theme
+* labs(title = "Total number of international displacement",
+*      subtitle = "Refugees, Asylum-seekers and Venezuelans displaced abroad from 2010 to 2019",
+*      caption = "Source: UNHCR Data Finder")
+```
+
+]
+
+--
+
+
+.pull-right[
+
+&lt;img src="presentation_files/figure-html/unnamed-chunk-15-1.png" width="1800" /&gt;
+
+]
+
+---
+
+### Build the chart
+
+.pull-left[
+
+
+```r
+ggplot(data = int_displ) +
+  aes(x = Year, y=`Number of displaced`) +
+* # Change color of bars
+* geom_col(color = unhcr_blue) +
+  coord_flip() +
+  unhcr_theme(grid = "Xx") +  
+  labs(title = "Total number of international displacement",
+       subtitle = "Refugees, Asylum-seekers and Venezuelans displaced abroad from 2010 to 2019", 
+       caption = "Source: UNHCR Data Finder") 
+```
+
+]
+
+--
+
+.pull-right[
+
+&lt;img src="presentation_files/figure-html/unnamed-chunk-17-1.png" width="1800" /&gt;
+
+]
+
+---
+
+### Build the chart
+
+.pull-left[
+
+
+```r
+ggplot(data = int_displ) +
+  aes(x = Year, y=`Number of displaced`) +
+* # Change color of bars
+* geom_col(fill = unhcr_blue) +
+  coord_flip() +
+  unhcr_theme(grid = "Xx") +  
+  labs(title = "Total number of international displacement",
+       subtitle = "Refugees, Asylum-seekers and Venezuelans displaced abroad from 2010 to 2019", 
+       caption = "Source: UNHCR Data Finder") 
+```
+
+]
+
+--
+
+
+.pull-right[
+
+&lt;img src="presentation_files/figure-html/unnamed-chunk-19-1.png" width="1800" /&gt;
+
+]
+
+---
+
+### Build the chart
+
+.pull-left[
+
+
+```r
+ggplot(data = int_displ) +
+  aes(x = Year, y=`Number of displaced`) +
+  geom_col(fill = unhcr_blue) +
+  coord_flip() +
+  unhcr_theme(grid = "Xx") +
+  labs(title = "Total number of international displacement",
+       subtitle = "Refugees, Asylum-seekers and Venezuelans displaced abroad\nfrom 2010 to 2019",
+       caption = "Source: UNHCR Data Finder",
+*      x = "") +
+* # Clean subtitle and improve axis labeling and limits
+* scale_y_continuous(labels = scales::label_number_si(),
+*                    limits = c(NA, 30000000))
+```
+]
+
+--
+
+.pull-right[
+
+&lt;img src="presentation_files/figure-html/unnamed-chunk-21-1.png" width="1800" /&gt;
+
+]
+
+---
+
+### Build the chart
+
+
+.pull-left[
+
+
+```r
+ggplot(data = int_displ) +
+  aes(x = Year, y=`Number of displaced`) +
+* # What if I want to show the different population type?
+* geom_col(aes(fill = `Population type`)) +
+  coord_flip() +
+  unhcr_theme(grid = "Xx") +
+  labs(title = "Total number of international displacement",
+       subtitle = "Refugees, Asylum-seekers and Venezuelans displaced abroad\nfrom 2010 to 2019",
+       caption = "Source: UNHCR Data Finder",
+       x = "") +
+  scale_y_continuous(labels = scales::label_number_si(),
+                     limits = c(NA, 30000000))
+```
+]
+
+--
+
+.pull-right[
+
+&lt;img src="presentation_files/figure-html/unnamed-chunk-23-1.png" width="1800" /&gt;
+
+]
+
+---
+
+### Build the chart
+
+.pull-left[
+
+
+```r
+ggplot(data = int_displ) +
+  aes(x = Year, y=`Number of displaced`) +
+  
+* # colors and reorder classes to be more easily comparable
+* geom_col(aes(fill = factor(`Population type`,
+*                            levels = c("Venezuelans displaced abroad", "Asylum-seekers", "Refugees")))) +
+  coord_flip() +
+  unhcr_theme(grid = "Xx") +
+  labs(title = "Total number of international displacement",
+       subtitle = "Refugees, Asylum-seekers and Venezuelans displaced abroad\nfrom 2010 to 2019",
+       caption = "Source: UNHCR Data Finder",
+       x = "") +
+  scale_y_continuous(labels = scales::label_number_si(),
+                     limits = c(NA, 30000000)) +
+* scale_fill_manual(values = usecol(pal = c(unhcr_green, unhcr_darkblue, unhcr_blue)))
+```
+
+]
+
+--
+
+.pull-right[
+
+&lt;img src="presentation_files/figure-html/unnamed-chunk-25-1.png" width="1800" /&gt;
+
+]
+
+
+---
+
+# The Grammar of graphics in 7 key syntax
+
+class: center
+
+.img75[![Structure of ggplot2](images/struct_ggplot.png)]
+
+[@CedSherer](https://twitter.com/CedScherer/status/1229418108122783744?s=20)
+
+???
+**Data**
+- Data is not just data
+- Representation defines what can be done with it
+- Grammar requires a tidy format (though it precedes the notion) 
+
+**Aesthetics**
+- Allow generic datasets to be understood by the graphic system.
+- Link variables in data to graphical properties in the geometry.
+
+**Layers**
+1. Geom
+    - How to interpret aesthetics as graphical representations
+    - Is a progression of positional aesthetics a number of points, a line, a single polygon, or something else entirely?
+2. Stats
+    - Transform input variables to displayed values
+    - Is implicit in many plot-types but can often be done prior to plotting
+
+**Scales**
+- A scale translate back and forth between variable ranges and property ranges
+    - Categories &gt; Colour
+    - Numbers &gt; Position
+
+**Coordinates**
+- Defines the physical mapping of the aesthetics to the paper 
+
+**Facets**
+- Define the number of panels with equal logic and split data among them…
+- Small multiples 
+
+**Themes**
+- Theming spans every part of the graphic that is not linked to data
 
 ---
 
 
-## A Vision for data analysis
+.pull-left[
 
-&lt;span style='font-size:50px; color:grey;'&gt;"Multi-functional teams, with strengthened data literacy, regularly conduct meaningful and documented joint data interpretation sessions to define their strategic directions based on statistical evidences"&lt;/span&gt;
+### Insert this in a slide -  Report template....
+
+All based on Rmarkdown that allow to create multiple outputs from the same content format.
+
+- Powerpoint with UNHCR style
+
+- Word with UNHCR style
+
+- html/bootstrap -scroll-able report
+
+- html/slide - slide-able report (WIP)
+
+- Paginated report built on the top of pagedown.
+
+- Analysis Repository contribution
+
+
+]
+
+.pull-right[
+
+Access them **"From Template"** panel when creating a new Rmd document
+
+![UNHCR Rmd templates](images/rmd_templates.png)
+
+]
+
+
+
+---
+class: center, middle, inverse
+
+
+# Practical Use Case 2 - Building impact indicators from Survey Data
+
+### *The National Household Survey is including Forcibly Displaced People and got published yesterday... We need to report our indicators by tomorrow!  * &lt;i class="fa fa-exclamation-triangle fa-fw fa-2x"&gt;&lt;/i&gt; 
+
+
+???
+
+
+
+We will use the “Encuesta Nacional de Calidad de Vida ECV 2020” published by the National Office of Colombia (http://microdatos.dane.gov.co/index.php/catalog/718/get_microdata) and explore different type of statistical analysis based on an example of three research questions:
+
 
 ---
 
-## A Theory of Change for Data analysis
+## Get the data
 
-&lt;span style='font-size:30px;'&gt;Proper user of data for advocacy &amp; programmatic decision making &lt;/span&gt;
 
- &lt;span style='font-size:40px;'&gt;&amp;#8618;&lt;/span&gt; Corporate __Standards__ exist to define how to encode &amp; process household surveys dataset
- 
- &lt;span style='font-size:40px;'&gt;&amp;#8618;&lt;/span&gt; Field data experts are trained based on precise recipes and predefined tools at each step of the __data life cycle__
+The dataset,  [Encuesta Nacional de Calidad de Vida ECV 2020, Colombia, DANE](http://microdatos.dane.gov.co/index.php/catalog/718/get_microdata) is available through a micro data library. The particularity of HH survey dataset, when stored in SPSS (`.sav`), SAS (`.sas7bdat`), or Stata (`.dta`) format is that they usually contains both values and __associated labels__ (we call them `labelled data`).
 
- &lt;span style='font-size:40px;'&gt;&amp;#8618;&lt;/span&gt; Data are presented, discussed and linked to expert knowledge during data __interpretation__ sessions with a multi-functional team
- 
- &lt;span style='font-size:40px;'&gt;&amp;#8618;&lt;/span&gt; All potential valid interpretations, including diverging views, are systematically __recorded__
- 
- &lt;span style='font-size:40px;'&gt;&amp;#8618;&lt;/span&gt;  __Persuasive__ "Data Stories“ and Policy papers are generated
+.pull-left[
+
+
+```r
+# http://microdatos.dane.gov.co/index.php/catalog/718/get_microdata 
+## Start with Household composition where disaggregation variables are
+data0 &lt;- haven::read_sav(here::here("data-raw", "Características y composición del hogar.sav"))
+
+# Multiple labelled files shall first be merged together.  
+data1 &lt;- haven::read_sav(here::here("data-raw", "Condiciones de vida del hogar y tenencia de bienes.sav"))
+data &lt;- dplyr::left_join(data0, data1, by = c("DIRECTORIO", "SECUENCIA_ENCUESTA", "SECUENCIA_P",       
+                                              "ORDEN", "FEX_C" ) )
+
+
+# create data dictionary 
+dictionary &lt;- labelled::generate_dictionary(data)
+
+## Display frame content
+data %&gt;% 
+       sjPlot::view_df()
+```
+]
+
+--
+
+.pull-right[
+
+```
+## P9025 [50], P784 [58], P1072 [70], P1077 [73], P795 [110], P1913 [118], P3202 [131], P3203 [144]
+```
+
+&lt;table style="border-collapse:collapse; border:none;"&gt;
+&lt;caption&gt;Data frame: .&lt;/caption&gt;
+&lt;tr&gt;
+&lt;th style="border-bottom:double; font-style:italic; font-weight:normal; padding:0.2cm; text-align:left; vertical-align:top;"&gt;ID&lt;/th&gt;&lt;th style="border-bottom:double; font-style:italic; font-weight:normal; padding:0.2cm; text-align:left; vertical-align:top;"&gt;Name&lt;/th&gt;&lt;th style="border-bottom:double; font-style:italic; font-weight:normal; padding:0.2cm; text-align:left; vertical-align:top;"&gt;Label&lt;/th&gt;&lt;th style="border-bottom:double; font-style:italic; font-weight:normal; padding:0.2cm; text-align:left; vertical-align:top;"&gt;Values&lt;/th&gt;&lt;th style="border-bottom:double; font-style:italic; font-weight:normal; padding:0.2cm; text-align:left; vertical-align:top;"&gt;Value Labels&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;DIRECTORIO&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Directorio&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;" colspan="2"&gt;&lt;em&gt;range: 7247300-7407013&lt;/em&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;SECUENCIA_ENCUESTA&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Secuencia_encuesta&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee" colspan="2"&gt;&lt;em&gt;range: 1-22&lt;/em&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;3&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;SECUENCIA_P&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Secuencia_p&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;" colspan="2"&gt;&lt;em&gt;range: 1-4&lt;/em&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;4&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;ORDEN&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Orden&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee" colspan="2"&gt;&lt;em&gt;range: 1-22&lt;/em&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;5&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;FEX_C&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Factor de expansión&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;" colspan="2"&gt;&lt;em&gt;range: 1.9-3061.6&lt;/em&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;6&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P6016&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Número de orden de la persona que proporciona la&lt;br&gt;información:&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee" colspan="2"&gt;&lt;em&gt;range: 1-18&lt;/em&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;7&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P1894&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Tipo de documento de identidad&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;br&gt;2&lt;br&gt;3&lt;br&gt;4&lt;br&gt;5&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Registro civil de nacimiento&lt;br&gt;Tarjeta de identidad&lt;br&gt;Cédula de ciudadanía&lt;br&gt;Cédula de extranjería&lt;br&gt;No tiene documento de identidad&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;8&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P6020&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Sexo&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Hombre&lt;br&gt;Mujer&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;9&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P6034&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;¿Cuál es la fecha de nacimiento de _____?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;" colspan="2"&gt;&lt;em&gt;range: 1-2&lt;/em&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;10&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P6040&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;¿cuántos años cumplidos tiene...?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee" colspan="2"&gt;&lt;em&gt;range: 0-106&lt;/em&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;11&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P6051&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Cuál es el parentesco de....con el jefe o la jefa&lt;br&gt;de este hogar?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;br&gt;2&lt;br&gt;3&lt;br&gt;4&lt;br&gt;5&lt;br&gt;6&lt;br&gt;7&lt;br&gt;8&lt;br&gt;9&lt;br&gt;10&lt;br&gt;11&lt;br&gt;12&lt;br&gt;13&lt;br&gt;14&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Jefe (a) del hogar&lt;br&gt;Pareja, esposo (a), cónyuge, compañero(a)&lt;br&gt;Hijo(a) hijastro(a)&lt;br&gt;Nieto (a)&lt;br&gt;Padre, madre, padrastro y madrastra&lt;br&gt;Suegro o suegra&lt;br&gt;Hermano (a), hermanastro (a)&lt;br&gt;Yerno, nuera&lt;br&gt;Otro pariente del jefe(a)&lt;br&gt;Empleado(a) del servicio doméstico&lt;br&gt;Parientes del servicio doméstico&lt;br&gt;Trabajador&lt;br&gt;Pensionista&lt;br&gt;Otro pariente&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;12&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P5502&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Actualmente…:&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;br&gt;2&lt;br&gt;3&lt;br&gt;4&lt;br&gt;5&lt;br&gt;6&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt; No está casado(a) y vive en pareja hace menos de dos años&lt;br&gt;No está casado(a) y vive en pareja hace dos años o más&lt;br&gt; Está viudo(a)&lt;br&gt;Está separado(a) o divorciado(a)&lt;br&gt; Está soltero(a)&lt;br&gt; Está casado(a)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;13&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P6071&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;El (la) cónyuge de .. vive en este hogar&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Sí&lt;br&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;14&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P6071S1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;No de orden&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee" colspan="2"&gt;&lt;em&gt;range: 1-19&lt;/em&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;15&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P756&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;¿Dónde nació  ________?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;br&gt;2&lt;br&gt;3&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;En este municipio&lt;br&gt;En otro municipio&lt;br&gt;En otro país&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;16&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P756S1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Departamento&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee" colspan="2"&gt;&lt;em&gt;range: 5-99&lt;/em&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;17&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P756S2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Municipio&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;" colspan="2"&gt;&lt;em&gt;range: 5001-99773&lt;/em&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;18&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P756S3&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;En otro país&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;br&gt;2&lt;br&gt;3&lt;br&gt;4&lt;br&gt;5&lt;br&gt;6&lt;br&gt;7&lt;br&gt;8&lt;br&gt;9&lt;br&gt;10&lt;br&gt;11&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Estados Unidos&lt;br&gt;España&lt;br&gt;Venezuela&lt;br&gt;Ecuador&lt;br&gt;Panamá&lt;br&gt;Perú&lt;br&gt;Costa Rica&lt;br&gt;Argentina&lt;br&gt;Francia&lt;br&gt;Italia&lt;br&gt;Otro país&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;19&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P6074&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;¿_______________ siempre ha vivido aquí en este&lt;br&gt;municipio?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Sí&lt;br&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;20&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P767&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;¿cuántos años continuos hace que vive ___ aquí en&lt;br&gt;este municipio?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee" colspan="2"&gt;&lt;em&gt;range: 0-90&lt;/em&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;21&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P6076&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Antes de venir a este municipio_______________&lt;br&gt;vivía en&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Otro país&lt;br&gt;Otro municipio&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;22&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P6076S1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Departamento&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;23&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P6076S2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Municipio
+&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;24&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P6077&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;_____ vivía en&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;El centro urbano donde está la alcaldía&lt;br&gt;Un corregimiento, inspección de policía, caserío, vereda o c&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;25&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P6096&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;¿cuál fue la razón principal para cambiar la&lt;br&gt;residencia al municipio actual?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;br&gt;2&lt;br&gt;3&lt;br&gt;4&lt;br&gt;5&lt;br&gt;6&lt;br&gt;7&lt;br&gt;8&lt;br&gt;9&lt;br&gt;10&lt;br&gt;11&lt;br&gt;12&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt; Dificultad para encontrar trabajo o ausencia de medios de s&lt;br&gt; Riesgo o consecuencia de desastre natural (inundación, aval&lt;br&gt;Amenaza o riesgo para su vida, su libertad o su integridad f&lt;br&gt; Necesidad de educación&lt;br&gt;Porque se casó o formó pareja&lt;br&gt; Motivos de salud&lt;br&gt; Mejorar la vivienda o localización&lt;br&gt; Mejores oportunidades laborales o de negocio&lt;br&gt;Acompañar a otro(s) miembro(s) del hogar&lt;br&gt;Adquisición de vivienda&lt;br&gt;Búsqueda de tranquilidad o mejor calidad de vida&lt;br&gt; Otra&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;26&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P6081&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;El padre de .. vive en este hogar&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;br&gt;2&lt;br&gt;3&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Sí&lt;br&gt;No&lt;br&gt;Fallecido&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;27&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P6081S1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;No. De orden&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;" colspan="2"&gt;&lt;em&gt;range: 1-15&lt;/em&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;28&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P6087&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;¿cuál es o fue el nivel de educación más alto&lt;br&gt;alcanzado por el padre de…..?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;br&gt;2&lt;br&gt;3&lt;br&gt;4&lt;br&gt;5&lt;br&gt;6&lt;br&gt;7&lt;br&gt;8&lt;br&gt;9&lt;br&gt;10&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Algunos años de primaria&lt;br&gt;Toda la primaria&lt;br&gt;Algunos años de secundaria&lt;br&gt;Toda la secundaria&lt;br&gt;Uno o mas años de técnica o tecnológica&lt;br&gt;Técnica o tecnológica completa&lt;br&gt;Uno o mas años de universidad&lt;br&gt;Universitaria completa&lt;br&gt;Ninguno&lt;br&gt;No sabe&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;29&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P6083&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;La madre de .. vive en este hogar&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;br&gt;2&lt;br&gt;3&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Sí&lt;br&gt;No&lt;br&gt;Fallecida&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;30&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P6083S1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;No. De orden&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee" colspan="2"&gt;&lt;em&gt;range: 1-18&lt;/em&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;31&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P6088&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;¿cuál es o fue el nivel de educación más alto&lt;br&gt;alcanzado por la madre de......?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;br&gt;2&lt;br&gt;3&lt;br&gt;4&lt;br&gt;5&lt;br&gt;6&lt;br&gt;7&lt;br&gt;8&lt;br&gt;9&lt;br&gt;10&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Algunos años de primaria&lt;br&gt;Toda la primaria&lt;br&gt;Algunos años de secundaria&lt;br&gt;Toda la secundaria&lt;br&gt;Uno o mas años de técnica o tecnológica&lt;br&gt;Técnica o tecnológica completa&lt;br&gt;Uno o mas años de universidad&lt;br&gt;Universitaria completa&lt;br&gt;Ninguno&lt;br&gt;No sabe&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;32&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P6080&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;De acuerdo con su cultura, pueblo o rasgos&lt;br&gt;físicos, _____ es o se reconoce comó:&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;br&gt;2&lt;br&gt;3&lt;br&gt;4&lt;br&gt;5&lt;br&gt;6&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Indígena&lt;br&gt;Gitano (a) (rom)&lt;br&gt;Raizal del background-color:#eeeeeehipiélago de San Andrés, Providencia y Santa C&lt;br&gt;Palenquero (a) de San Basilio&lt;br&gt;Negro (a), mulato (a) (afrodescendiente), afrocolombiano(a)&lt;br&gt;Ninguno de los anteriores&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;33&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P5667&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt; ¿a cuál pueblo o etnia indígena pertenece _____?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;34&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P2057&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;¿Usted se considera campesino(a)?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;br&gt;2&lt;br&gt;3&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Si&lt;br&gt;No&lt;br&gt;No informa&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;35&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P2059&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt; ¿Usted considera que alguna vez fue campesino(a)?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;br&gt;2&lt;br&gt;3&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Si&lt;br&gt;No&lt;br&gt;No informa&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;36&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P2061&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt; ¿Usted considera que la comunidad en que vive es&lt;br&gt;campesina?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;br&gt;2&lt;br&gt;3&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Si&lt;br&gt;No&lt;br&gt;No informa&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;37&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P1895&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;En general, qué tan satisfecho(a) se siente ...&lt;br&gt;con su vida actualmente?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;0&lt;br&gt;1&lt;br&gt;2&lt;br&gt;3&lt;br&gt;4&lt;br&gt;5&lt;br&gt;6&lt;br&gt;7&lt;br&gt;8&lt;br&gt;9&lt;br&gt;10&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Totalmente insatisfecho(a)&lt;br&gt;1&lt;br&gt;2&lt;br&gt;3&lt;br&gt;4&lt;br&gt;5&lt;br&gt;6&lt;br&gt;7&lt;br&gt;8&lt;br&gt;9&lt;br&gt;Totalmente satisfecho(a)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;38&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P1896&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;En general, qué tan satisfecho(a) se siente ...&lt;br&gt;con su ingreso actualmente?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;0&lt;br&gt;1&lt;br&gt;2&lt;br&gt;3&lt;br&gt;4&lt;br&gt;5&lt;br&gt;6&lt;br&gt;7&lt;br&gt;8&lt;br&gt;9&lt;br&gt;10&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Totalmente insatisfecho(a)&lt;br&gt;1&lt;br&gt;2&lt;br&gt;3&lt;br&gt;4&lt;br&gt;5&lt;br&gt;6&lt;br&gt;7&lt;br&gt;8&lt;br&gt;9&lt;br&gt;Totalmente satisfecho(a)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;39&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P1897&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;En general, qué tan satisfecho(a) se siente ...&lt;br&gt;con su salud actualmente?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;0&lt;br&gt;1&lt;br&gt;2&lt;br&gt;3&lt;br&gt;4&lt;br&gt;5&lt;br&gt;6&lt;br&gt;7&lt;br&gt;8&lt;br&gt;9&lt;br&gt;10&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Totalmente insatisfecho(a)&lt;br&gt;1&lt;br&gt;2&lt;br&gt;3&lt;br&gt;4&lt;br&gt;5&lt;br&gt;6&lt;br&gt;7&lt;br&gt;8&lt;br&gt;9&lt;br&gt;Totalmente satisfecho(a)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;40&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P1898&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;En general, qué tan satisfecho(a) se siente ...&lt;br&gt;con su nivel de seguridad actualmente?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;0&lt;br&gt;1&lt;br&gt;2&lt;br&gt;3&lt;br&gt;4&lt;br&gt;5&lt;br&gt;6&lt;br&gt;7&lt;br&gt;8&lt;br&gt;9&lt;br&gt;10&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Totalmente insatisfecho(a)&lt;br&gt;1&lt;br&gt;2&lt;br&gt;3&lt;br&gt;4&lt;br&gt;5&lt;br&gt;6&lt;br&gt;7&lt;br&gt;8&lt;br&gt;9&lt;br&gt;Totalmente satisfecho(a)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;41&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P1899&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;En general, qué tan satisfecho(a) se siente ...&lt;br&gt;con su trabajo/actividad actualmente?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;0&lt;br&gt;1&lt;br&gt;2&lt;br&gt;3&lt;br&gt;4&lt;br&gt;5&lt;br&gt;6&lt;br&gt;7&lt;br&gt;8&lt;br&gt;9&lt;br&gt;10&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Totalmente insatisfecho(a)&lt;br&gt;1&lt;br&gt;2&lt;br&gt;3&lt;br&gt;4&lt;br&gt;5&lt;br&gt;6&lt;br&gt;7&lt;br&gt;8&lt;br&gt;9&lt;br&gt;Totalmente satisfecho(a)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;42&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P3175&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt; En general, ¿qué tan satisfecho/a se siente _____&lt;br&gt;con su tiempo libre?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;0&lt;br&gt;1&lt;br&gt;2&lt;br&gt;3&lt;br&gt;4&lt;br&gt;5&lt;br&gt;6&lt;br&gt;7&lt;br&gt;8&lt;br&gt;9&lt;br&gt;10&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Totalmente insatisfecho(a)&lt;br&gt;1&lt;br&gt;2&lt;br&gt;3&lt;br&gt;4&lt;br&gt;5&lt;br&gt;6&lt;br&gt;7&lt;br&gt;8&lt;br&gt;9&lt;br&gt;Totalmente satisfecho(a)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;43&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P1901&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt; ¿qué tan feliz se sintió ... el día de ayer?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;0&lt;br&gt;1&lt;br&gt;2&lt;br&gt;3&lt;br&gt;4&lt;br&gt;5&lt;br&gt;6&lt;br&gt;7&lt;br&gt;8&lt;br&gt;9&lt;br&gt;10&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Para nada feliz&lt;br&gt;1&lt;br&gt;2&lt;br&gt;3&lt;br&gt;4&lt;br&gt;5&lt;br&gt;6&lt;br&gt;7&lt;br&gt;8&lt;br&gt;9&lt;br&gt;Todo el tiempo feliz&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;44&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P1903&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;¿qué tan preocupado(a) se sintió ... el día de&lt;br&gt;ayer?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;0&lt;br&gt;1&lt;br&gt;2&lt;br&gt;3&lt;br&gt;4&lt;br&gt;5&lt;br&gt;6&lt;br&gt;7&lt;br&gt;8&lt;br&gt;9&lt;br&gt;10&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Para nada  preocupado(a)&lt;br&gt;1&lt;br&gt;2&lt;br&gt;3&lt;br&gt;4&lt;br&gt;5&lt;br&gt;6&lt;br&gt;7&lt;br&gt;8&lt;br&gt;9&lt;br&gt;Todo el tiempo preocupado(a)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;45&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P1904&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;¿qué tan triste se sintió ... el día de ayer?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;0&lt;br&gt;1&lt;br&gt;2&lt;br&gt;3&lt;br&gt;4&lt;br&gt;5&lt;br&gt;6&lt;br&gt;7&lt;br&gt;8&lt;br&gt;9&lt;br&gt;10&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Para nada  triste&lt;br&gt;1&lt;br&gt;2&lt;br&gt;3&lt;br&gt;4&lt;br&gt;5&lt;br&gt;6&lt;br&gt;7&lt;br&gt;8&lt;br&gt;9&lt;br&gt;Todo el tiempo triste&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;46&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P1905&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Qué tanto considera ... que las cosas que hace en&lt;br&gt;su vida valen la pena?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;0&lt;br&gt;1&lt;br&gt;2&lt;br&gt;3&lt;br&gt;4&lt;br&gt;5&lt;br&gt;6&lt;br&gt;7&lt;br&gt;8&lt;br&gt;9&lt;br&gt;10&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;No valen la pena&lt;br&gt;1&lt;br&gt;2&lt;br&gt;3&lt;br&gt;4&lt;br&gt;5&lt;br&gt;6&lt;br&gt;7&lt;br&gt;8&lt;br&gt;9&lt;br&gt;Valen totalmente la pena&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;47&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P1927&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;¿En cuál escalón diría usted que se encuentra&lt;br&gt;parado(a) en este momento?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;0&lt;br&gt;1&lt;br&gt;2&lt;br&gt;3&lt;br&gt;4&lt;br&gt;5&lt;br&gt;6&lt;br&gt;7&lt;br&gt;8&lt;br&gt;9&lt;br&gt;10&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Peor vida&lt;br&gt;1&lt;br&gt;2&lt;br&gt;3&lt;br&gt;4&lt;br&gt;5&lt;br&gt;6&lt;br&gt;7&lt;br&gt;8&lt;br&gt;9&lt;br&gt;Mejor vida&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;48&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P1079&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Quien contesta este capitulo&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Jefe(a) de hogar&lt;br&gt;Cónyuge&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;49&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P9010&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;¿cómo se siente en el barrio, pueblo o vereda&lt;br&gt;donde vive?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Seguro (a)&lt;br&gt;Inseguro (a)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;51&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P9025S1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Atracos o robos&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Sí&lt;br&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;52&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P9025S2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Otro hecho violento (homicidios, asesinatos,&lt;br&gt;secuestros, lesiones personales, violaciones,&lt;br&gt;extorsiones y desalojos)&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Sí&lt;br&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;53&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P9030&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Actualmente las condiciones de vida en su hogar&lt;br&gt;son:&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;br&gt;2&lt;br&gt;3&lt;br&gt;4&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Muy buenas&lt;br&gt;Buenas&lt;br&gt;Regulares&lt;br&gt;Malas&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;54&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P9040&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Con relación al hogar donde usted se crió, este&lt;br&gt;hogar vive económicamente:&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;br&gt;2&lt;br&gt;3&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Mejor&lt;br&gt;Igual&lt;br&gt;Peor&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;55&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P9050&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Usted piensa que el nivel de vida actual de su&lt;br&gt;hogar, respecto al que tenía 5 años atrás es:&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;br&gt;2&lt;br&gt;3&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Mejor&lt;br&gt;Igual&lt;br&gt;Peor&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;56&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P5230&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;¿usted se considera pobre?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Sí&lt;br&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;57&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P9090&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;¿los ingresos de su hogar?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;br&gt;2&lt;br&gt;3&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;No alcanza para cubrir los gatos mínimos&lt;br&gt;Sólo alcanza para cubrir los gastos mínimos&lt;br&gt;Cubre más que los gastos mínimos&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;59&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P784S1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Familias en acción?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Si&lt;br&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;60&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P784S1A1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;¿cuántos miembros del hogar recibieron el&lt;br&gt;subsidio?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee" colspan="2"&gt;&lt;em&gt;range: 1-8&lt;/em&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;61&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P784S1A2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;¿Cuánto recibieron en los últimos 12 meses?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;" colspan="2"&gt;&lt;em&gt;range: 98-9600000&lt;/em&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;62&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P784S2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Programas para adultos mayores? (colombia mayor)&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Si&lt;br&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;63&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P784S2A1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;¿cuántos miembros del hogar recibieron el&lt;br&gt;subsidio?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;" colspan="2"&gt;&lt;em&gt;range: 1-7&lt;/em&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;64&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P784S2A2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;¿Cuánto recibieron en los últimos 12 meses?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee" colspan="2"&gt;&lt;em&gt;range: 98-4800000&lt;/em&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;65&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P784S5&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Ayudas monetarias por la pandemia del coronavius&lt;br&gt;(ingreso solidario; pago adicional como&lt;br&gt;beneficiarios de Familias en Acción, Adulto mayor&lt;br&gt;o Jóvenes en Acción; servicios públicos)?	
+&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt; Sí&lt;br&gt; No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;66&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P784S5A1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;¿cuántos miembros del hogar recibieron el&lt;br&gt;subsidio?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee" colspan="2"&gt;&lt;em&gt;range: 1-10&lt;/em&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;67&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P784S5A2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;¿Cuánto recibieron en los últimos  12 meses?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;" colspan="2"&gt;&lt;em&gt;range: 98-10000000&lt;/em&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;68&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P784S4&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Otro, cuál?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Si&lt;br&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;69&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P784S4A1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Cuántos Programas? (ayudas o  subsidios en dinero&lt;br&gt;o en especie de entidades del gobierno nacional,&lt;br&gt;departamental o municipal)&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;" colspan="2"&gt;&lt;em&gt;range: 1-3&lt;/em&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;71&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P1072S1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Libras&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;999&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;No sabe&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;72&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P1072S2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Gramos&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;999&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;No sabe&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;74&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P1077S1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Máquina lavadora de ropa&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Sí&lt;br&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;75&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P1077S2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Nevera o refrigerador&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Sí&lt;br&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;76&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P1077S3&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Estufa eléctrica o de gas&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Sí&lt;br&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;77&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P1077S4&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Horno eléctrico o de gas&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Sí&lt;br&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;78&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P1077S5&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Horno microondas&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Sí&lt;br&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;79&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P1077S6&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Calentador de agua eléctrico o de gas o ducha&lt;br&gt;eléctrica&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Sí&lt;br&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;80&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P1077S27&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Plancha&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Sí&lt;br&gt; No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;81&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P1077S7&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Tv a color convencional&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Sí&lt;br&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;82&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P1077S8&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Tv  LCD, plasma o led&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Sí&lt;br&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;83&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P1077S9&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Reproductor de video (dvd, blue-ray, otros)&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Sí&lt;br&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;84&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P1077S10&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Equipo de sonido&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Sí&lt;br&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;85&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P1077S11&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Aire acondicionado&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Sí&lt;br&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;86&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P1077S12&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Ventilador o abanico&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Sí&lt;br&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;87&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P1077S13&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Reproductores digitales de música, video e imagen&lt;br&gt;(mp3, mp4, ipod)&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Sí&lt;br&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;88&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P1077S14&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Consolas para juegos electrónicos: play station,&lt;br&gt;x-box, wii, psp, nintendos, gameboy, etc.&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Sí&lt;br&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;89&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P1077S15&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Carro particular&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Sí&lt;br&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;90&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P1077S15A1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Cuántos?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee" colspan="2"&gt;&lt;em&gt;range: 1-9&lt;/em&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;91&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P1077S16&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Moto o motoneta&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Sí&lt;br&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;92&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P1077S16A1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Cuántos?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee" colspan="2"&gt;&lt;em&gt;range: 1-10&lt;/em&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;93&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P1077S17&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Bicicleta&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Sí&lt;br&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;94&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P1077S18&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Casa, apartamento  o finca de recreo&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Sí&lt;br&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;95&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P1077S19&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Servicio de televisión por suscripción cable o&lt;br&gt;antena parabólica&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Sí&lt;br&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;96&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P1077S20&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Cámara fotográfica digital o de video&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Sí&lt;br&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;97&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P1077S21&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Computador de escritorio&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Sí&lt;br&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;98&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P1077S21A1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Cuántos?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee" colspan="2"&gt;&lt;em&gt;range: 1-9&lt;/em&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;99&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P1077S22&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Computador portátil&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Sí&lt;br&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;100&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P1077S22A1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Cuántos?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee" colspan="2"&gt;&lt;em&gt;range: 1-10&lt;/em&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;101&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P1077S23&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Tableta&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Sí&lt;br&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;102&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P1077S23A1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Cuántas?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee" colspan="2"&gt;&lt;em&gt;range: 1-5&lt;/em&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;103&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P1076&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;¿cuál es la principal razón  por la que el hogar &lt;br&gt;no tiene computador?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;br&gt;2&lt;br&gt;3&lt;br&gt;4&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;No están interesados&lt;br&gt;No saben cómo usarlo&lt;br&gt;Es demasiado costoso&lt;br&gt;Otra&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;104&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P1075&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;¿el hogar tiene conexión a internet?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Sí&lt;br&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;105&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P1075S1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Fijo&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Sí&lt;br&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;106&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P1075S2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Móvil&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Sí&lt;br&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;107&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P3199&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;¿Pagan en este hogar por el servicio de internet&lt;br&gt;fijo (de forma individual o en combo o paquete)?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Sí&lt;br&gt; No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;108&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P1074&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;¿cuál es la razón principal por la que el hogar no&lt;br&gt;tiene conexión a internet?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;br&gt;2&lt;br&gt;3&lt;br&gt;4&lt;br&gt;5&lt;br&gt;6&lt;br&gt;7&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Es muy costoso&lt;br&gt;No lo considera necesario&lt;br&gt;No tiene un dispositivo para conectarse&lt;br&gt;Tiene acceso suficiente desde otros lugares sin costo&lt;br&gt;No sabe usarlo&lt;br&gt;No hay cobertura en la zona&lt;br&gt;Otra&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;109&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P1073&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;¿el hogar tiene previsto tener conexión a internet&lt;br&gt;en los próximos 12 meses?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Sí&lt;br&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;111&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P795S1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Señal abierta&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Señal abierta&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;112&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P795S1A1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Señal abierta - Análoga	&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Si&lt;br&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;113&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P795S1A2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Señal abierta - TDT
+&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Si&lt;br&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;114&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P795S2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Cable	&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Cable&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;115&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P795S3&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt; Satelital&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt; Satelital&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;116&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P795S4&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;IPTV&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;IPTV&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;117&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P3201&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;¿Pagan en este hogar por servicio de TV (de forma&lt;br&gt;individual o en combo o paquete)?&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;br&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Si&lt;br&gt;No&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;119&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P1913S1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Paradero o estación de transporte público&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Paradero o estación de transporte público&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;120&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P1913S2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Establecimiento educativo o de cuidado de niños y&lt;br&gt;niñas (colegio, jardín infantil, hogar comunitario&lt;br&gt;o centro de desarrollo infantil)&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Establecimiento educativo o de cuidado de niños y niñas (col&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;121&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P1913S3&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Hospital o centro de salud&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;3&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Hospital o centro de salud&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;122&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P1913S10&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P1913S10&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee" colspan="2"&gt;&lt;em&gt;range: 0-999&lt;/em&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;123&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P1913S9&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Plaza de mercado&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;5&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Plaza de mercado&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;124&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P1913S5&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Estación de policía o CAI&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;6&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt; Estación de policía o CAI&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;125&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P1913S6&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Droguería o farmacia&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;7&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt; Droguería o farmacia&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;126&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P1913S7&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Parque o zonas verdes&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;8&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt; Parque o zonas verdes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;127&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P1913S11&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Escenarios culturales o recreativos (biblioteca,&lt;br&gt;casa de la cultura, teatro, etc.)&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;9&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Escenarios culturales o recreativos (biblioteca, casa de la&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;128&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P1913S12&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt; Espacios deportivos (cancha, pista, coliseo)&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;10&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Espacios deportivos (cancha, pista, coliseo)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;129&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P1913S8&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Banco, cajero automático o corresponsal bancario&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;11&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Banco, Cajero automático o  corresponsal bancario&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;130&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P1913S13&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Centro de venta o acopio (sólo para centros&lt;br&gt;poblados y rural disperso)&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;12&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt; Centro de venta o acopio (sólo para centros poblados y rura&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;132&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P3202S1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;El jefe/a de hogar perdió su empleo	
+&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;El jefe/a de hogar perdió su empleo&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;133&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P3202S2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;El/la cónyuge perdió su empleo&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;El/la cónyuge perdió su empleo&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;134&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P3202S3&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Otro miembro del hogar perdió su empleo&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Otro miembro del hogar perdió su empleo&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;135&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P3202S4&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Tuvieron que cerrar el negocio del cual derivaban&lt;br&gt;su ingreso&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Tuvieron que cerrar el negocio del cual derivaban su ingreso&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;136&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P3202S5&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;No pudieron vender la producción de su finca o&lt;br&gt;negocio&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;No pudieron vender la producción de su finca o negocio&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;137&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P3202S6&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Se atrasaron en el pago del jardín o colegio&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Se atrasaron en el pago del jardín o colegio&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;138&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P3202S7&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;No pudieron pagar la universidad o la matrícula&lt;br&gt;del programa técnico o tecnológico&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;No pudieron pagar la universidad o la matrícula del programa&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;139&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P3202S8&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Se atrasaron en el pago de la vivienda&lt;br&gt;(arrendamiento o cuota del crédito)&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Se atrasaron en el pago de la vivienda (arrendamiento o cuot&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;140&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P3202S9&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Se atrasaron en el pago de administración o&lt;br&gt;celaduría&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Se atrasaron en el pago de administración o celaduría&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;141&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P3202S10&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Se atrasaron en el pago de servicios públicos&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Se atrasaron en el pago de servicios públicos&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;142&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P3202S11&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Se atrasaron en el pago de impuestos (predial,&lt;br&gt;valorización o renta)&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Se atrasaron en el pago de impuestos (predial, valorización&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;143&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P3202S12&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Ninguno de las anteriores&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Ninguno de las anteriores&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;145&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P3203S1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Uno o más miembros del hogar que no trabajaban&lt;br&gt;empezaron a trabajar&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Uno o más miembros del hogar que no trabajaban empezaron a t&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;146&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P3203S2&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Adoptaron nuevas fuente de ingreso&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Adoptaron nuevas fuente de ingreso&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;147&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P3203S3&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Se fueron a vivir con familiares o acogieron a un&lt;br&gt;familiar&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Se fueron a vivir con familiares o acogieron a un familiar&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;148&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P3203S4&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Gastaron parte o todos sus ahorros&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Gastaron parte o todos sus ahorros&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;149&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P3203S5&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Se endeudaron o ampliaron el plazo de alguna(s)&lt;br&gt;deuda(s)&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Se endeudaron o ampliaron el plazo de alguna(s) deuda(s)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;150&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P3203S6&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Vendieron algunos bienes o activos (moto, carro,&lt;br&gt;electrodoméstico, lote)&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Vendieron algunos bienes o activos (moto, carro, electrodomé&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;151&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P3203S7&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Vendieron o dieron en pago la vivienda ocupada por&lt;br&gt;el hogar&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Vendieron o dieron en pago la vivienda ocupada por el hogar&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;152&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P3203S8&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Retiraron hijos/as de la escuela, colegio o jardín&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Retiraron hijos/as de la escuela, colegio o jardín&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;153&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P3203S9&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Retiraron hijos/a de la universidad o de la&lt;br&gt;carrera técnica o tecnológica&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Retiraron hijos/a de la universidad o de la carrera técnica&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;154&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P3203S10&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Disminuyeron el gasto en alimentos&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Disminuyeron el gasto en alimentos&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;155&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P3203S11&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Pidieron ayuda del gobierno local o nacional o de&lt;br&gt;otras entidades&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Pidieron ayuda del gobierno local o nacional o de otras enti&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;156&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P3203S12&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Pidieron ayuda de familiares, amigos u otras&lt;br&gt;personas del barrio, pueblo o vereda&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Pidieron ayuda de familiares, amigos u otras personas del ba&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;157&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;P3203S13&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Solicitaron subsidio al desempleo&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top;"&gt;Solicitaron subsidio al desempleo&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;158&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;P3203S14&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Otra&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;1&lt;/td&gt;
+&lt;td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee"&gt;Otra&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;/table&gt;
+]
+
+???
+https://www.pipinghotdata.com/posts/2020-12-23-leveraging-labelled-data-in-r/ 
 
 
 ---
+
+## Simple plot with labelled data
+
+.pull-left[
+
+
+```r
+weight &lt;- as.vector(data$FEX_C)
+
+sjPlot::plot_frq(data$P756S3, 
+                            type = "bar",
+                            sort.frq =  "asc",
+                            coord.flip = TRUE,
+                            weight.by = weight,
+                            show.ci = TRUE,
+                            geom.colors =  unhcRstyle::unhcr_blue) +
+      unhcRstyle::unhcr_theme(base_size = 8)  + ## Insert UNHCR Style
+      theme(legend.position = "none",
+            panel.grid.major.x  = element_line(color = "#cbcbcb"), 
+            panel.grid.major.y  = element_blank(), 
+            panel.grid.minor = element_blank()) + ### changing grid line that should appear
+      ## and the chart labels
+      labs(title = paste0(sjlabelled::get_label(data$P756S3)),
+           subtitle = paste0(names(data$P756S3)),
+           x = "",
+           y = "",
+           caption = "Source: Encusta Nacional de Calidad de Vida ECV 2020, Colombia, DANE")
+```
+]
+
+--
+
+.pull-right[
+&lt;img src="presentation_files/figure-html/unnamed-chunk-29-1.png" width="1080" /&gt;
+]
+
+???
  
+
+---
+
+## Do calculation
+
+   
+---
+class: center, middle, inverse
+
+
+# Practical Use Case 3 - Evidence for key research question
+
+### * What programmatic assumptions do we have evidences for? Describe, Explore, Explain...  *  &lt;i class="fa fa-eye fa-fw fa-2x"&gt;&lt;/i&gt; 
+
+
+---
+
+## Statistical association analysis: Crosstabulation &amp; Assocation
+
+
+&gt; __Question__: How is the perception of current situation compared to that of 5 years ago differs between the "undocumented Venezuelans" and the rest of the population? 
+
+
+.pull-left[
+
+
+```r
+data$IllegalVenez &lt;- ifelse( (data$P1894 == 5 &amp; data$P756S3 == 3), paste("Venz_SinDocumento"), paste("other"))
+cross &lt;- c("IllegalVenez")
+i &lt;- 55
+
+sjPlot::plot_xtab(x= data[[i]],
+                               grp = data[[cross]],
+                               type = "bar",
+                               weight.by = weight,
+                               # sort.frq =  "asc",
+                               # bar.pos = "stack",
+                               wrap.labels = 40,
+                               show.n = FALSE,
+                               show.total = FALSE,
+                               show.summary = TRUE,
+                               show.prc = FALSE,
+                               summary.pos = "r",
+                               coord.flip = TRUE) +
+        #unhcRstyle::unhcr_theme(base_size = 8)  + ## Insert UNHCR Style
+        theme(#legend.position = "none",
+              panel.grid.major.x  = element_line(color = "#cbcbcb"),
+              panel.grid.major.y  = element_blank(),
+              panel.grid.minor = element_blank()) + ### changing grid line that should appear
+        ## and the chart labels
+        labs(title = paste0(sjlabelled::get_label(data[i])),
+             subtitle = paste0("Crossed with ", cross),
+             x = "",
+             y = "",
+             caption = "Source: Encuesta Nacional de Calidad de Vida ECV 2020, Colombia, DANE")
+```
+]
+
+--
+
+.pull-right[
+&lt;img src="presentation_files/figure-html/unnamed-chunk-31-1.png" width="1080" /&gt;
+]
+
+???
+
+---
+
+## Regression analysis between a target variable and multiple predictors
+&gt; __Question__: What can explain why some "undocumented Venezuelans" feel worse now than five years ago? 
+ 
+
+---
+
+## Clustering analysis to identify a homogeneous group of individuals based on multiple variables
+
+&gt; __Question__: What are the main profiles of "undocumented Venezuelans" who have a worse situation now than 5 years ago? 
+  
+   
+
+---
+class: left, top
+
+# Thank you
+
+### Good luck in your R journey
+
+
+.pull-left[
+
+Facilitation: Edouard Legoupil, Snr Statistics &amp; Data Analysis Officer, &lt;a href="mailto:legoupil@unhcr.org"&gt;&lt;i class="fa fa-paper-plane fa-fw"&gt;&lt;/i&gt;&amp;nbsp; legoupil@unhcr.org&lt;/a&gt; | &lt;a href="http://twitter.com/edouard_lgp"&gt;&lt;i class="fa fa-twitter fa-fw"&gt;&lt;/i&gt;&amp;nbsp; @edouard_lgp&lt;/a&gt;  &amp; Hisham Galal, Ass Statistics &amp; Data Analysis Officer, &lt;a href="mailto:galal@unhcr.org"&gt;&lt;i class="fa fa-paper-plane fa-fw"&gt;&lt;/i&gt;&amp;nbsp; galal@unhcr.org&lt;/a&gt;
+
+
+Check our github @ &lt;a href="http://github.com/unhcr-americas"&gt;&lt;i class="fa fa-github fa-fw"&gt;&lt;/i&gt;&amp;nbsp; unhcr-americas&lt;/a&gt;  and learn about __UnhcRverse packages__&lt;br&gt;
+
+Slides created with [**remark.js**](http://remarkjs.com/) and the R package [**xaringan**](https://github.com/yihui/xaringan). Slides notes for this presentation can be displayed by pressing keyboard shortcut `p` - Navigation help with keyboard shortcut `h`
+
+
+]
+
+.pull-right[
+
+&lt;img src="images/giphy.gif" width="350px"/&gt;
+
+]
+
+
+???
+Resources Ggplot:
+
+- [Ggplot main doc](https://ggplot2.tidyverse.org/index.html)
+- [The ggplot flipbook](https://evamaerey.github.io/ggplot_flipbook/ggplot_flipbook_xaringan.html#1) by Gina Reynolds
+- [A ggplot2 tutorial for beautiful plotting in R](https://www.cedricscherer.com/2019/08/05/a-ggplot2-tutorial-for-beautiful-plotting-in-r/) and [ggplot Wizardry Hands-On](https://z3tt.github.io/OutlierConf2021/) by Cedric Scherer
+- Ggplot workshop [Part1](https://www.youtube.com/watch?v=h29g21z0a68)/[Part2](https://www.youtube.com/watch?v=0m4yywqNPVY) by Thomas Lin Pedersen (one of the main maintainer of ggplot)
+
+
+ 
+ packages extension for ggplot
+
+- Patchwork to bind multiple plots on one
+
+- Gganimate to create simple animation
+
+- Ggtext and ggrepel to deal with annotation and text style
+
+- Ggforce to group some content visually
+
+- and much more.... just go out there and experiment
+
+
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
