@@ -134,7 +134,7 @@ As a coauthor/reader/peer reviewer, one would like to see the whole **research p
 
 What analysis is **behind the figure**? Did it accounts for [..._new last minute question_...] in the analysis? 
  
-What **dataset** (_final vs preliminary version_) was used ? Were **outliers** identified?  
+What **dataset** (_final vs preliminary version_) was used ? Were **outliers** identified? How did you **weight** your sample?
 
 Oops, there is an error in the data. Can we **repeat the analysis**? And update quickly the figures, graphs and tables in the report and the presentation! 
 ]
@@ -189,7 +189,7 @@ Provide **public access** to scripts, runs, and results
 
 ---
 
-## Enabling a fully auditable workflow
+## Enable a fully auditable workflow
 
 As soon as all steps (i.e. **DATA + TIDYING + MODELING + VISUALS + NARRATIVE**) are done through **series of written commands recorded in scripts**:
 
@@ -201,10 +201,13 @@ As soon as all steps (i.e. **DATA + TIDYING + MODELING + VISUALS + NARRATIVE**) 
 
  - Customization are facilitated and allow to deliver  final product  with a professional branding and styling.
  
+
+ 
 &gt; Analysis becomes streamlined and [reproducible](https://unhcr-americas.github.io/reproducibility)! 
 
 &gt; A "collaboration mode" is enabled from the begining of the process! 
 
+&gt; As your analysis can be reviewed, you become "covered"... 
 
 ???
  instead of **hundreds of mouse clicks**
@@ -308,7 +311,7 @@ class: center, middle, inverse
 
 ---
 
-## How to get to the chart below?
+## How to get to this chart in a couple of lines?
 
 &lt;img src="presentation_files/figure-html/unnamed-chunk-1-1.png" width="80%" /&gt;
 
@@ -778,10 +781,7 @@ ggplot(data = int_displ) +
 
 # The Grammar of graphics in 7 key syntax
 
-class: center
-
 .img75[![Structure of ggplot2](images/struct_ggplot.png)]
-
 [@CedSherer](https://twitter.com/CedScherer/status/1229418108122783744?s=20)
 
 ???
@@ -878,6 +878,29 @@ The dataset,  [Encuesta Nacional de Calidad de Vida ECV 2020, Colombia, DANE](ht
 
 
 ```r
+#  Packages             
+if (!require("unhcRstyle")) remotes::install_github('unhcr-web/unhcRstyle')
+if (!require("tidyverse")) install.packages("tidyverse", dependencies = TRUE)
+if (!require("haven")) install.packages("haven", dependencies = TRUE)
+if (!require("sjmisc")) install.packages("sjmisc", dependencies = TRUE)
+if (!require("sjPlot")) install.packages("sjPlot", dependencies = TRUE)
+if (!require("dplyr")) install.packages("dplyr", dependencies = TRUE)
+if (!require("ggrepel")) install.packages("ggrepel", dependencies = TRUE)
+if (!require("Hmisc")) install.packages("Hmisc", dependencies = TRUE)
+if (!require("ggplot2")) install.packages("ggplot2", dependencies = TRUE)
+if (!require("ggthemes")) install.packages("ggthemes", dependencies = TRUE)
+if (!require("here")) install.packages("here", dependencies = TRUE)
+library(tidyverse)
+library(dplyr)
+library(haven) 
+library(sjlabelled)
+library(sjmisc) 
+library(sjPlot)
+library(ggrepel)
+library(Hmisc)
+library(ggplot2)
+library(ggthemes)
+library(here)
 # http://microdatos.dane.gov.co/index.php/catalog/718/get_microdata 
 ## Start with Household composition where disaggregation variables are
 data0 &lt;- haven::read_sav(here::here("data-raw", "Características y composición del hogar.sav"))
@@ -1537,17 +1560,19 @@ class: center, middle, inverse
 ---
 class: left, top
 
-# Thank you
+# Good luck in your R journey!
 
-### Good luck in your R journey - reach out to us for analysis peer review
+### Reach out to us for questions, analysis mentoring or code peer review!
 
 
 .pull-left[
 
-DIMA Americas: Edouard Legoupil, Snr Statistics &amp; Data Analysis Officer, &lt;a href="mailto:legoupil@unhcr.org"&gt;&lt;i class="fa fa-paper-plane fa-fw"&gt;&lt;/i&gt;&amp;nbsp; legoupil@unhcr.org&lt;/a&gt; | &lt;a href="http://twitter.com/edouard_lgp"&gt;&lt;i class="fa fa-twitter fa-fw"&gt;&lt;/i&gt;&amp;nbsp; @edouard_lgp&lt;/a&gt; &lt;br&gt; Hisham Galal, Ass Statistics &amp; Data Analysis Officer, &lt;a href="mailto:galal@unhcr.org"&gt;&lt;i class="fa fa-paper-plane fa-fw"&gt;&lt;/i&gt;&amp;nbsp; galal@unhcr.org&lt;/a&gt;
+__DIMA Americas__: &lt;br&gt;
+Edouard Legoupil, _Snr Statistics &amp; Data Analysis Officer_, &lt;a href="mailto:legoupil@unhcr.org"&gt;&lt;i class="fa fa-paper-plane fa-fw"&gt;&lt;/i&gt;&amp;nbsp; legoupil@unhcr.org&lt;/a&gt; | &lt;a href="http://twitter.com/edouard_lgp"&gt;&lt;i class="fa fa-twitter fa-fw"&gt;&lt;/i&gt;&amp;nbsp; @edouard_lgp&lt;/a&gt; &lt;br&gt; 
+Hisham Galal, _Associate Statistics &amp; Data Analysis Officer_, &lt;a href="mailto:galal@unhcr.org"&gt;&lt;i class="fa fa-paper-plane fa-fw"&gt;&lt;/i&gt;&amp;nbsp; galal@unhcr.org&lt;/a&gt;
 
 
-Check our github @ &lt;a href="http://github.com/unhcr-americas"&gt;&lt;i class="fa fa-github fa-fw"&gt;&lt;/i&gt;&amp;nbsp; unhcr-americas&lt;/a&gt;  and learn about __UnhcRverse packages__&lt;br&gt;
+Check our github @ &lt;a href="http://github.com/unhcr-americas"&gt;&lt;i class="fa fa-github fa-fw"&gt;&lt;/i&gt;&amp;nbsp;unhcr-americas&lt;/a&gt;  and learn about __UnhcRverse packages__&lt;br&gt;
 
 Slides created with [**remark.js**](http://remarkjs.com/) and the R package [**xaringan**](https://github.com/yihui/xaringan). Slides notes for this presentation can be displayed by pressing keyboard shortcut `p` - Navigation help with keyboard shortcut `h`
 
@@ -1556,7 +1581,7 @@ Slides created with [**remark.js**](http://remarkjs.com/) and the R package [**x
 
 .pull-right[
 
-&lt;img src="images/giphy.gif" width="320px"/&gt;
+&lt;img src="images/giphy.gif" width="310px"/&gt;
 
 ]
 

@@ -143,7 +143,7 @@ As a coauthor/reader/peer reviewer, one would like to see the whole **research p
 
 What analysis is **behind the figure**? Did it accounts for [..._new last minute question_...] in the analysis? 
  
-What **dataset** (_final vs preliminary version_) was used ? Were **outliers** identified?  
+What **dataset** (_final vs preliminary version_) was used ? Were **outliers** identified? How did you **weight** your sample?
 
 Oops, there is an error in the data. Can we **repeat the analysis**? And update quickly the figures, graphs and tables in the report and the presentation! 
 ]
@@ -198,7 +198,7 @@ Provide **public access** to scripts, runs, and results
 
 ---
 
-## Enabling a fully auditable workflow
+## Enable a fully auditable workflow
 
 As soon as all steps (i.e. **DATA + TIDYING + MODELING + VISUALS + NARRATIVE**) are done through **series of written commands recorded in scripts**:
 
@@ -210,10 +210,13 @@ As soon as all steps (i.e. **DATA + TIDYING + MODELING + VISUALS + NARRATIVE**) 
 
  - Customization are facilitated and allow to deliver  final product  with a professional branding and styling.
  
+
+ 
 > Analysis becomes streamlined and [reproducible](https://unhcr-americas.github.io/reproducibility)! 
 
 > A "collaboration mode" is enabled from the begining of the process! 
 
+> As your analysis can be reviewed, you become "covered"... 
 
 ???
  instead of **hundreds of mouse clicks**
@@ -317,54 +320,75 @@ class: center, middle, inverse
 
 ---
 
-## How to get to the chart below?
+## How to get to this chart in a couple of lines?
 
 ```{r echo=FALSE, out.width = "80%"}
 #Prepare data2
 library(tidyverse)
 thiscountry <- "Panama"
+thisbureau <- "Americas"
 
 lastyear <- max(unhcrdatapackage::end_year_population_totals_long$Year)
 ## Loading the stat tables
 Origin <- dplyr::left_join( x= unhcrdatapackage::end_year_population_totals_long, 
-                                                     y= unhcrdatapackage::reference, 
-                                                     by = c("CountryAsylumCode" = "iso_3"))  %>%
-  filter(CountryAsylumName  == thiscountry & Year == lastyear &
-           Population.type  %in%c("REF", "ASY", "VDA" )) %>%   
-  mutate(CountryAsylumName = str_replace(CountryAsylumName, " \\(Bolivarian Republic of\\)", ""),
-        CountryAsylumName = str_replace(CountryAsylumName, "Iran \\(Islamic Republic of\\)", "Iran"),
-        CountryAsylumName = str_replace(CountryAsylumName, "United Kingdom of Great Britain and Northern Ireland", "UK")) %>% 
+                            y= unhcrdatapackage::reference, 
+                            by = c("CountryAsylumCode" = "iso_3"))  %>%
+  filter(CountryAsylumName  == thiscountry & 
+         UNHCRBureau == thisbureau &
+          Year == lastyear &
+         Population.type  %in%c("REF", "ASY", "VDA" )) %>%   
+  mutate(CountryOriginName = str_replace(CountryOriginName, " \\(Bolivarian Republic of\\)", ""),
+         CountryOriginName = str_replace(CountryOriginName, "Iran \\(Islamic Republic of\\)", "Iran"),
+         CountryOriginName = str_replace(CountryOriginName, "United Kingdom of Great Britain and Northern Ireland", "UK")) %>% 
   group_by( CountryOriginName) %>%
-  summarise(Value2 = sum(Value) )  %>%
-  mutate( Value3 =  scales::label_number_si(accuracy = 0.1)(Value2)) %>%
-  arrange(desc(Value2)) %>%
+  summarise(DisplacedAcrossBorders = sum(Value) )  %>%
+  mutate( DisplacedAcrossBordersRound =  ifelse(DisplacedAcrossBorders > 1000, 
+                           paste(scales::label_number_si(accuracy = 0.1)(DisplacedAcrossBorders)),
+                           as.character(DisplacedAcrossBorders) ) ) %>%
+  arrange(desc(DisplacedAcrossBorders)) %>%
   head(10)
 
-
-if( nrow(Origin) == 0 ){
-  cat(paste0("There's no recorded countries of Origin in ",thiscountry )) 
-  } else {
-
 #Make plot
-ggplot(Origin, aes(x = reorder(CountryOriginName, Value2), ## Reordering country by Value
-                           y = Value2)) +
+ggplot(Origin, aes(x = reorder(CountryOriginName, DisplacedAcrossBorders), ## Reordering country by Value
+                           y = DisplacedAcrossBorders)) +
+      
+  # here we configure that it will be bar chart    
   geom_bar(stat = "identity", 
            position = "identity", 
-           fill = "#0072bc") + # here we configure that it will be bar chart+
-  geom_label(aes(x = CountryOriginName, y = Value2, 
-                #label =  format(round(Value2, -3),  big.mark=",")), 
-                label =  Value3), 
-             hjust = 1, 
-             vjust = 0.5, 
-             colour = "white", 
-             fill = NA, 
-             label.size = NA, 
-             family = "Lato", 
-             size = 4) + 
-  coord_flip() + # Add `coord_flip()` to make your vertical bars horizontal:
+           fill = "#0072bc") + 
+
+  ## Format axis number
+  scale_y_continuous( label = scales::label_number_si()) + 
+  
+  ## Position label differently in the bar in white - outside bar in black
+  geom_label( data = subset(Origin, DisplacedAcrossBorders < max(DisplacedAcrossBorders) / 1.5),
+              aes(x = reorder(CountryOriginName, DisplacedAcrossBorders), 
+                  y = DisplacedAcrossBorders,
+                  label= DisplacedAcrossBordersRound),
+              hjust = -0.1 ,
+              vjust = 0.5, 
+              colour = "black", 
+              fill = NA, 
+              label.size = NA, 
+              family = "Lato", 
+              size = 4   ) +  
+
+  geom_label( data = subset(Origin, DisplacedAcrossBorders >= max(DisplacedAcrossBorders) / 1.5),
+              aes(x = reorder(CountryOriginName, DisplacedAcrossBorders), 
+                  y = DisplacedAcrossBorders,
+                  label= DisplacedAcrossBordersRound),
+              hjust = 1.1 ,
+              vjust = 0.5, 
+              colour = "white", 
+              fill = NA, 
+              label.size = NA, 
+              family = "Lato", 
+              size = 4   ) +   
+  # Add `coord_flip()` to make your vertical bars horizontal:
+  coord_flip() + 
   ## and the chart labels
   labs(title = paste0("What are the main Origin of Forced Displacement across Borders?" ),
-       subtitle = paste0("Top 10 Originfrom Americas -Data as of ",lastyear, "  in ",thiscountry ), 
+       subtitle = paste0("Top 10 Origin from Americas - Data as of ",lastyear, "  in ",thiscountry ), 
        x = " ",
        y = "# of Forcibly displaced people",
        caption = "Data: UNHCR Refugee Population Statistics Database.\n Forced Displacement includes Refugees, Asylym Seekers and Venezuelan Displaced Abroad Population Group.") +
@@ -373,7 +397,7 @@ ggplot(Origin, aes(x = reorder(CountryOriginName, Value2), ## Reordering country
   unhcRstyle::unhcr_theme(base_size = 8)  + ## Insert UNHCR Style
   theme(panel.grid.major.x = element_line(color = "#cbcbcb"), 
         panel.grid.major.y = element_blank()) ### changing grid line that should appear
-}
+
 ```
 
 ???
@@ -880,6 +904,30 @@ The dataset,  [Encuesta Nacional de Calidad de Vida ECV 2020, Colombia, DANE](ht
 .pull-left[
 
 ```{r , eval=FALSE, comment='#'}
+
+#  Packages             
+if (!require("unhcRstyle")) remotes::install_github('unhcr-web/unhcRstyle')
+if (!require("tidyverse")) install.packages("tidyverse", dependencies = TRUE)
+if (!require("haven")) install.packages("haven", dependencies = TRUE)
+if (!require("sjmisc")) install.packages("sjmisc", dependencies = TRUE)
+if (!require("sjPlot")) install.packages("sjPlot", dependencies = TRUE)
+if (!require("dplyr")) install.packages("dplyr", dependencies = TRUE)
+if (!require("ggrepel")) install.packages("ggrepel", dependencies = TRUE)
+if (!require("Hmisc")) install.packages("Hmisc", dependencies = TRUE)
+if (!require("ggplot2")) install.packages("ggplot2", dependencies = TRUE)
+if (!require("ggthemes")) install.packages("ggthemes", dependencies = TRUE)
+if (!require("here")) install.packages("here", dependencies = TRUE)
+library(tidyverse)
+library(dplyr)
+library(haven) 
+library(sjlabelled)
+library(sjmisc) 
+library(sjPlot)
+library(ggrepel)
+library(Hmisc)
+library(ggplot2)
+library(ggthemes)
+library(here)
 # http://microdatos.dane.gov.co/index.php/catalog/718/get_microdata 
 ## Start with Household composition where disaggregation variables are
 data0 <- haven::read_sav(here::here("data-raw", "Características y composición del hogar.sav"))
@@ -1381,17 +1429,19 @@ class: center, middle, inverse
 ---
 class: left, top
 
-# Thank you
+# Good luck in your R journey!
 
-### Good luck in your R journey - reach out to us for analysis peer review
+### Reach out to us for questions, analysis mentoring or code peer review!
 
 
 .pull-left[
 
-DIMA Americas: Edouard Legoupil, Snr Statistics & Data Analysis Officer, <a href="mailto:legoupil@unhcr.org"><i class="fa fa-paper-plane fa-fw"></i>&nbsp; legoupil@unhcr.org</a> | <a href="http://twitter.com/edouard_lgp"><i class="fa fa-twitter fa-fw"></i>&nbsp; @edouard_lgp</a> <br> Hisham Galal, Ass Statistics & Data Analysis Officer, <a href="mailto:galal@unhcr.org"><i class="fa fa-paper-plane fa-fw"></i>&nbsp; galal@unhcr.org</a>
+__DIMA Americas__: <br>
+Edouard Legoupil, _Snr Statistics & Data Analysis Officer_, <a href="mailto:legoupil@unhcr.org"><i class="fa fa-paper-plane fa-fw"></i>&nbsp; legoupil@unhcr.org</a> | <a href="http://twitter.com/edouard_lgp"><i class="fa fa-twitter fa-fw"></i>&nbsp; @edouard_lgp</a> <br> 
+Hisham Galal, _Associate Statistics & Data Analysis Officer_, <a href="mailto:galal@unhcr.org"><i class="fa fa-paper-plane fa-fw"></i>&nbsp; galal@unhcr.org</a>
 
 
-Check our github @ <a href="http://github.com/unhcr-americas"><i class="fa fa-github fa-fw"></i>&nbsp; unhcr-americas</a>  and learn about __UnhcRverse packages__<br>
+Check our github @ <a href="http://github.com/unhcr-americas"><i class="fa fa-github fa-fw"></i>&nbsp;unhcr-americas</a>  and learn about __UnhcRverse packages__<br>
 
 Slides created with [**remark.js**](http://remarkjs.com/) and the R package [**xaringan**](https://github.com/yihui/xaringan). Slides notes for this presentation can be displayed by pressing keyboard shortcut `p` - Navigation help with keyboard shortcut `h`
 
@@ -1400,7 +1450,7 @@ Slides created with [**remark.js**](http://remarkjs.com/) and the R package [**x
 
 .pull-right[
 
-<img src="images/giphy.gif" width="320px"/>
+<img src="images/giphy.gif" width="310px"/>
 
 ]
 
