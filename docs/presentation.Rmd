@@ -784,10 +784,7 @@ ggplot(data = int_displ) +
 
 # The Grammar of graphics in 7 key syntax
 
-class: center
-
 .img75[![Structure of ggplot2](images/struct_ggplot.png)]
-
 [@CedSherer](https://twitter.com/CedScherer/status/1229418108122783744?s=20)
 
 ???
@@ -910,24 +907,35 @@ data %>%
 ## Start with Household composition where disaggregation variables are
 data0 <- haven::read_sav(here::here("data-raw", "Características y composición del hogar.sav"))
 
-# Multiple labelled files shall first be merged together.  
-data1 <- haven::read_sav(here::here("data-raw", "Condiciones de vida del hogar y tenencia de bienes.sav"))
-data <- dplyr::left_join(data0, data1, by = c("DIRECTORIO", "SECUENCIA_ENCUESTA", "SECUENCIA_P",       
-                                              "ORDEN", "FEX_C" ) )
-
-
-
-# create data dictionary  
-dictionary <- labelled::generate_dictionary(data)
-
 ## Display frame content
-data %>% 
+data0 %>% 
        sjPlot::view_df()
 ```
 ]
 
 ???
 https://www.pipinghotdata.com/posts/2020-12-23-leveraging-labelled-data-in-r/ 
+
+## Look what is inside the frame
+
+
+.pull-left[
+
+```{r , eval=FALSE, comment='#'}
+# create data dictionary  
+dictionary <- labelled::generate_dictionary(data0)
+View(dictionary)
+```
+]
+
+--
+
+.pull-right[
+ 
+]
+
+???
+ 
 
 
 ---
@@ -937,23 +945,22 @@ https://www.pipinghotdata.com/posts/2020-12-23-leveraging-labelled-data-in-r/
 .pull-left[
 
 ```{r , eval=FALSE, comment='#'}
-weight <- as.vector(data$FEX_C)
-
-sjPlot::plot_frq(data$P756S3, 
+sjPlot::plot_frq(data0$P756S3, 
                             type = "bar",
                             sort.frq =  "asc",
                             coord.flip = TRUE,
-                            weight.by = weight,
+                            weight.by = as.vector(data0$FEX_C),
                             show.ci = TRUE,
                             geom.colors =  unhcRstyle::unhcr_blue) +
+      scale_y_continuous(labels = scales::label_number_si()) +
+  
       unhcRstyle::unhcr_theme(base_size = 8)  + ## Insert UNHCR Style
       theme(legend.position = "none",
             panel.grid.major.x  = element_line(color = "#cbcbcb"), 
             panel.grid.major.y  = element_blank(), 
             panel.grid.minor = element_blank()) + ### changing grid line that should appear
       ## and the chart labels
-      labs(title = paste0(sjlabelled::get_label(data$P756S3)),
-           subtitle = paste0(names(data$P756S3)),
+      labs(title = paste0(sjlabelled::get_label(data0$P756S3)),
            x = "",
            y = "",
            caption = "Source: Encusta Nacional de Calidad de Vida ECV 2020, Colombia, DANE")
@@ -965,23 +972,22 @@ sjPlot::plot_frq(data$P756S3,
 
 .pull-right[
 ```{r , echo=FALSE}
-weight <- as.vector(data$FEX_C)
-
-sjPlot::plot_frq(data$P756S3, 
+sjPlot::plot_frq(data0$P756S3, 
                             type = "bar",
                             sort.frq =  "asc",
                             coord.flip = TRUE,
-                            weight.by = weight,
+                            weight.by = as.vector(data0$FEX_C),
                             show.ci = TRUE,
                             geom.colors =  unhcRstyle::unhcr_blue) +
+      scale_y_continuous(labels = scales::label_number_si()) +
+  
       unhcRstyle::unhcr_theme(base_size = 8)  + ## Insert UNHCR Style
       theme(legend.position = "none",
             panel.grid.major.x  = element_line(color = "#cbcbcb"), 
             panel.grid.major.y  = element_blank(), 
             panel.grid.minor = element_blank()) + ### changing grid line that should appear
       ## and the chart labels
-      labs(title = paste0(sjlabelled::get_label(data$P756S3)),
-           subtitle = paste0(names(data$P756S3)),
+      labs(title = paste0(sjlabelled::get_label(data0$P756S3)),
            x = "",
            y = "",
            caption = "Source: Encusta Nacional de Calidad de Vida ECV 2020, Colombia, DANE")
@@ -993,7 +999,278 @@ sjPlot::plot_frq(data$P756S3,
 
 ---
 
-## Do calculation
+## Join data frame
+
+.pull-left[
+
+
+
+```{r , eval=FALSE, comment='#'}
+# read data based on a list of files in a folder with a specific extension (i.e. sav)
+# all the dataset will be stored in a list object
+datasets <- fs::dir_ls(here::here("data-raw"), 
+                       glob = "*.sav") %>% 
+            map(compose(as_factor, haven::read_sav))
+
+# Bind together datasets with the same unit of analysis
+persons <- datasets %>% 
+           keep(~!all(.$SECUENCIA_P == 1) &
+                  !all(.$SECUENCIA_ENCUESTA == 1)) %>% 
+           reduce(full_join)
+
+households <- datasets %>% 
+              keep(~all(.$SECUENCIA_P == 1) & 
+                     !all(.$SECUENCIA_ENCUESTA == 1)) %>% 
+              reduce(full_join)
+
+
+# harmonize key variables - 
+# notice how SECUENCIA_ENCUESTA changes meaning between datasets
+persons <- persons %>% 
+           rename(dwelling = DIRECTORIO, 
+                  household = SECUENCIA_P, 
+                  person = SECUENCIA_ENCUESTA)
+
+households <- households %>% 
+              rename(dwelling = DIRECTORIO, 
+                     household = SECUENCIA_ENCUESTA) %>% 
+              select(-ORDEN)
+```
+]
+
+--
+
+.pull-right[
+```{r , echo=FALSE}
+# read data based on a list of files in a folder with a specific extension (i.e. sav)
+# all the dataset will be stored in a list object
+datasets <- fs::dir_ls(here::here("data-raw"), 
+                       glob = "*.sav") %>% 
+            map(compose(as_factor, haven::read_sav))
+
+# Bind together datasets with the same unit of analysis
+persons <- datasets %>% 
+           keep(~!all(.$SECUENCIA_P == 1) &
+                  !all(.$SECUENCIA_ENCUESTA == 1)) %>% 
+           reduce(full_join)
+
+households <- datasets %>% 
+              keep(~all(.$SECUENCIA_P == 1) & 
+                     !all(.$SECUENCIA_ENCUESTA == 1)) %>% 
+              reduce(full_join)
+
+
+# Harmonize Key Variables 
+# notice how SECUENCIA_ENCUESTA changes meaning between datasets
+persons <- persons %>% 
+           rename(dwelling = DIRECTORIO, 
+                  household = SECUENCIA_P, 
+                  person = SECUENCIA_ENCUESTA)
+
+households <- households %>% 
+              rename(dwelling = DIRECTORIO, 
+                     household = SECUENCIA_ENCUESTA) %>% 
+              select(-ORDEN)
+```
+]
+
+???
+ 
+
+---
+
+## Perform calculations
+
+.pull-left[
+
+```{r , eval=FALSE, comment='#'}
+data <-  
+  left_join(persons, households) %>% 
+  transmute(pop = case_when(is.na(P756S3) ~ "Colombians",
+                            P756S3 == "Venezuela" ~ "Venezuelans",
+                            TRUE ~ "Others"))
+
+indicators <-  
+  left_join(persons, households) %>% 
+  transmute(pop = case_when(is.na(P756S3) ~ "Colombians",
+                            P756S3 == "Venezuela" ~ "Venezuelans",
+                            TRUE ~ "Others"),
+            
+            # 2.1 Proportion of PoC living below the national poverty line
+            rbm2.1 = PERCAPITA < 327674, 
+            
+            water = P792 != "No tienen el servicio",
+            sanitation = P5032 != "No tienen el servicio",
+            overcrowding = CANT_PERSONAS_HOGAR/P5000 > 3,
+            secure_tenure = 
+              P5095 == "Propia, totalmente pagada" |
+              P5095 == "Propia, lo están pagando" |
+              (P5095 == "En arriendo o subarriendo" & P3006 == "Escrito"),
+            housing_durability = TRUE, # FIXME: correct when we get the missing data file
+       
+            # 2.2 Proportion of PoCs residing in physically safe and secure settlements 
+            # with access to basic facilities
+            rbm2.2 = water & sanitation & !overcrowding & housing_durability & secure_tenure,
+            
+            # 2.3 Proportion of PoC with access to health services
+            rbm2.3 = if_else(P5665 == "Sí", is.na(P6153), NA),
+            dpto = "dummy", # FIXME: should be dwellings$dpto,
+            wt = FEX_C)  %>%
+         
+         ## Remove the neither colombian nor venezuelan
+         filter(pop != "Others") %>% 
+         
+         ## transform in a srvey weighter dataset
+         srvyr::as_survey_design(strata = dpto, 
+                          weights = wt) %>% 
+         ## Compile indicators by group
+         group_by(pop) %>% 
+         summarize(across(contains("rbm"), 
+                          srvyr::survey_mean, 
+                          vartype = "ci", 
+                          na.rm = TRUE,
+                          .names = "{.col}_est")) %>% 
+         pivot_longer(-pop, 
+                      names_to = c("ind", ".value"), 
+                      names_pattern = "(.+?)_(.+)")
+```
+]
+
+--
+
+.pull-right[
+```{r , echo=FALSE}
+
+data <-  
+  left_join(persons, households) %>% 
+  transmute(pop = case_when(is.na(P756S3) ~ "Colombians",
+                            P756S3 == "Venezuela" ~ "Venezuelans",
+                            TRUE ~ "Others"))
+
+indicators <-  
+  left_join(persons, households) %>% 
+  transmute(pop = case_when(is.na(P756S3) ~ "Colombians",
+                            P756S3 == "Venezuela" ~ "Venezuelans",
+                            TRUE ~ "Others"),
+            
+            # 2.1 Proportion of PoC living below the national poverty line
+            rbm2.1 = PERCAPITA < 327674, 
+            
+            water = P792 != "No tienen el servicio",
+            sanitation = P5032 != "No tienen el servicio",
+            overcrowding = CANT_PERSONAS_HOGAR/P5000 > 3,
+            secure_tenure = 
+              P5095 == "Propia, totalmente pagada" |
+              P5095 == "Propia, lo están pagando" |
+              (P5095 == "En arriendo o subarriendo" & P3006 == "Escrito"),
+            housing_durability = TRUE, # FIXME: correct when we get the missing data file
+       
+            # 2.2 Proportion of PoCs residing in physically safe and secure settlements 
+            # with access to basic facilities
+            rbm2.2 = water & sanitation & !overcrowding & housing_durability & secure_tenure,
+            
+            # 2.3 Proportion of PoC with access to health services
+            rbm2.3 = if_else(P5665 == "Sí", is.na(P6153), NA),
+            dpto = "dummy", # FIXME: should be dwellings$dpto,
+            wt = FEX_C)  %>%
+        ## Remove the neither colombian nor venezuelan
+        filter(pop != "Others") %>% 
+         
+        ## transform in a srvey weighter dataset
+         srvyr::as_survey_design(strata = dpto, 
+                          weights = wt) %>% 
+         ## Compile indicators by group
+         group_by(pop) %>% 
+         summarize(across(contains("rbm"), 
+                          srvyr::survey_mean, 
+                          vartype = "ci", 
+                          na.rm = TRUE,
+                          .names = "{.col}_est")) %>% 
+         pivot_longer(-pop, 
+                      names_to = c("ind", ".value"), 
+                      names_pattern = "(.+?)_(.+)")
+```
+]
+
+???
+ 
+
+---
+
+## Generate a chart
+
+.pull-left[
+
+```{r , eval=FALSE, comment='#'}
+## Add labels for each calculated indicators
+rbm_indicaors <- 
+  c(rbm2.1 = "2.1 Proportion of PoC living below the national poverty line",
+    rbm2.2 = "2.2 Proportion of PoCs residing in physically safe and secure settlements with access to basic facilities.",
+    rbm2.3 = "2.3 Proportion of PoC with access to health services")
+
+
+ggplot( data = indicators,
+  aes(est, fct_rev(ind))) +
+  geom_pointrange(aes(xmin = est_low, 
+                      xmax = est_upp, 
+                      color = pop), 
+                  size = .75) +
+  geom_text(aes(label = scales::label_percent(.1)(est)), 
+                 vjust = -1.25) +
+  scale_x_continuous(labels = scales::label_percent(), 
+                     limits = c(0, 1), 
+                     breaks = c(0, .5, 1)) +
+  scale_y_discrete(labels = str_wrap(rev(rbm_indicaors), 40)) +
+  scale_color_manual(values = c(Colombians = "black", Venezuelans = "#0072BC")) +
+  labs(x = "estimate", 
+       y = "indicator",
+       title = "Impact Area 2: Realizing Rights in Safe Environments",
+       caption = glue::glue("Encuesta Nacional de Calidad de Vida (ECV) 2020\n",
+                            "# of Venezuelans = {scales::label_comma()(sum(data$pop=='Venezuelans'))} obs. ",
+                            "({scales::label_number_si(.1)(sum((data$pop=='Venezuelans')*data$wt))} weighted)")) +
+  unhcRstyle::unhcr_theme() +
+  theme(panel.grid.minor.x = element_blank())
+```
+]
+
+--
+
+.pull-right[
+```{r , echo=FALSE}
+## Add labels for each calculated indicators
+rbm_indicaors <- 
+  c(rbm2.1 = "2.1 Proportion of PoC living below the national poverty line",
+    rbm2.2 = "2.2 Proportion of PoCs residing in physically safe and secure settlements with access to basic facilities.",
+    rbm2.3 = "2.3 Proportion of PoC with access to health services")
+
+
+ggplot( data = indicators,
+  aes(est, fct_rev(ind))) +
+  geom_pointrange(aes(xmin = est_low, 
+                      xmax = est_upp, 
+                      color = pop), 
+                  size = .75) +
+  geom_text(aes(label = scales::label_percent(.1)(est)), 
+                 vjust = -1.25) +
+  scale_x_continuous(labels = scales::label_percent(), 
+                     limits = c(0, 1), 
+                     breaks = c(0, .5, 1)) +
+  scale_y_discrete(labels = str_wrap(rev(rbm_indicaors), 40)) +
+  scale_color_manual(values = c(Colombians = "black", Venezuelans = "#0072BC")) +
+  labs(x = "estimate", 
+       y = "indicator",
+       title = "Impact Area 2: Realizing Rights in Safe Environments",
+       caption = glue::glue("Encuesta Nacional de Calidad de Vida (ECV) 2020\n",
+                            "# of Venezuelans = {scales::label_comma()(sum(data$pop=='Venezuelans'))} obs. ",
+                            "({scales::label_number_si(.1)(sum((data$pop=='Venezuelans')*data$wt))} weighted)")) +
+  unhcRstyle::unhcr_theme() +
+  theme(panel.grid.minor.x = element_blank())
+```
+]
+
+???
+ 
+
 
    
 ---
@@ -1016,34 +1293,34 @@ class: center, middle, inverse
 .pull-left[
 
 ```{r , eval=FALSE, comment='#'}
-data$IllegalVenez <- ifelse( (data$P1894 == 5 & data$P756S3 == 3), paste("Venz_SinDocumento"), paste("other"))
-cross <- c("IllegalVenez")
-i <- 55
-
-sjPlot::plot_xtab(x= data[[i]],
-                               grp = data[[cross]],
-                               type = "bar",
-                               weight.by = weight,
-                               # sort.frq =  "asc",
-                               # bar.pos = "stack",
-                               wrap.labels = 40,
-                               show.n = FALSE,
-                               show.total = FALSE,
-                               show.summary = TRUE,
-                               show.prc = FALSE,
-                               summary.pos = "r",
-                               coord.flip = TRUE) +
-        #unhcRstyle::unhcr_theme(base_size = 8)  + ## Insert UNHCR Style
-        theme(#legend.position = "none",
-              panel.grid.major.x  = element_line(color = "#cbcbcb"),
-              panel.grid.major.y  = element_blank(),
-              panel.grid.minor = element_blank()) + ### changing grid line that should appear
-        ## and the chart labels
-        labs(title = paste0(sjlabelled::get_label(data[i])),
-             subtitle = paste0("Crossed with ", cross),
-             x = "",
-             y = "",
-             caption = "Source: Encuesta Nacional de Calidad de Vida ECV 2020, Colombia, DANE")
+# data$IllegalVenez <- ifelse( (data$P1894 == 5 & data$P756S3 == 3), paste("Venz_SinDocumento"), paste("other"))
+# cross <- c("IllegalVenez")
+# i <- 55
+# 
+# sjPlot::plot_xtab(x= data[[i]],
+#                                grp = data[[cross]],
+#                                type = "bar",
+#                                weight.by = weight,
+#                                # sort.frq =  "asc",
+#                                # bar.pos = "stack",
+#                                wrap.labels = 40,
+#                                show.n = FALSE,
+#                                show.total = FALSE,
+#                                show.summary = TRUE,
+#                                show.prc = FALSE,
+#                                summary.pos = "r",
+#                                coord.flip = TRUE) +
+#         #unhcRstyle::unhcr_theme(base_size = 8)  + ## Insert UNHCR Style
+#         theme(#legend.position = "none",
+#               panel.grid.major.x  = element_line(color = "#cbcbcb"),
+#               panel.grid.major.y  = element_blank(),
+#               panel.grid.minor = element_blank()) + ### changing grid line that should appear
+#         ## and the chart labels
+#         labs(title = paste0(sjlabelled::get_label(data[i])),
+#              subtitle = paste0("Crossed with ", cross),
+#              x = "",
+#              y = "",
+#              caption = "Source: Encuesta Nacional de Calidad de Vida ECV 2020, Colombia, DANE")
 
 
 ```
@@ -1053,34 +1330,34 @@ sjPlot::plot_xtab(x= data[[i]],
 
 .pull-right[
 ```{r , echo=FALSE}
-data$IllegalVenez <- ifelse( (data$P1894 == 5 & data$P756S3 == 3), paste("Venz_SinDocumento"), paste("other"))
-cross <- c("IllegalVenez")
-i <- 55
-
-sjPlot::plot_xtab(x= data[[i]],
-                               grp = data[[cross]],
-                               type = "bar",
-                               weight.by = weight,
-                               # sort.frq =  "asc",
-                               # bar.pos = "stack",
-                               wrap.labels = 40,
-                               show.n = FALSE,
-                               show.total = FALSE,
-                               show.summary = TRUE,
-                               show.prc = FALSE,
-                               summary.pos = "r",
-                               coord.flip = TRUE) +
-        #unhcRstyle::unhcr_theme(base_size = 8)  + ## Insert UNHCR Style
-        theme(#legend.position = "none",
-              panel.grid.major.x  = element_line(color = "#cbcbcb"),
-              panel.grid.major.y  = element_blank(),
-              panel.grid.minor = element_blank()) + ### changing grid line that should appear
-        ## and the chart labels
-        labs(title = paste0(sjlabelled::get_label(data[i])),
-             subtitle = paste0("Crossed with ", cross),
-             x = "",
-             y = "",
-             caption = "Source: Encuesta Nacional de Calidad de Vida ECV 2020, Colombia, DANE")
+# data$IllegalVenez <- ifelse( (data$P1894 == 5 & data$P756S3 == 3), paste("Venz_SinDocumento"), paste("other"))
+# cross <- c("IllegalVenez")
+# i <- 55
+# 
+# sjPlot::plot_xtab(x= data[[i]],
+#                                grp = data[[cross]],
+#                                type = "bar",
+#                                weight.by = weight,
+#                                # sort.frq =  "asc",
+#                                # bar.pos = "stack",
+#                                wrap.labels = 40,
+#                                show.n = FALSE,
+#                                show.total = FALSE,
+#                                show.summary = TRUE,
+#                                show.prc = FALSE,
+#                                summary.pos = "r",
+#                                coord.flip = TRUE) +
+#         #unhcRstyle::unhcr_theme(base_size = 8)  + ## Insert UNHCR Style
+#         theme(#legend.position = "none",
+#               panel.grid.major.x  = element_line(color = "#cbcbcb"),
+#               panel.grid.major.y  = element_blank(),
+#               panel.grid.minor = element_blank()) + ### changing grid line that should appear
+#         ## and the chart labels
+#         labs(title = paste0(sjlabelled::get_label(data[i])),
+#              subtitle = paste0("Crossed with ", cross),
+#              x = "",
+#              y = "",
+#              caption = "Source: Encuesta Nacional de Calidad de Vida ECV 2020, Colombia, DANE")
 
 ```
 ]
@@ -1106,12 +1383,12 @@ class: left, top
 
 # Thank you
 
-### Good luck in your R journey
+### Good luck in your R journey - reach out to us for analysis peer review
 
 
 .pull-left[
 
-Facilitation: Edouard Legoupil, Snr Statistics & Data Analysis Officer, <a href="mailto:legoupil@unhcr.org"><i class="fa fa-paper-plane fa-fw"></i>&nbsp; legoupil@unhcr.org</a> | <a href="http://twitter.com/edouard_lgp"><i class="fa fa-twitter fa-fw"></i>&nbsp; @edouard_lgp</a>  & Hisham Galal, Ass Statistics & Data Analysis Officer, <a href="mailto:galal@unhcr.org"><i class="fa fa-paper-plane fa-fw"></i>&nbsp; galal@unhcr.org</a>
+DIMA Americas: Edouard Legoupil, Snr Statistics & Data Analysis Officer, <a href="mailto:legoupil@unhcr.org"><i class="fa fa-paper-plane fa-fw"></i>&nbsp; legoupil@unhcr.org</a> | <a href="http://twitter.com/edouard_lgp"><i class="fa fa-twitter fa-fw"></i>&nbsp; @edouard_lgp</a> <br> Hisham Galal, Ass Statistics & Data Analysis Officer, <a href="mailto:galal@unhcr.org"><i class="fa fa-paper-plane fa-fw"></i>&nbsp; galal@unhcr.org</a>
 
 
 Check our github @ <a href="http://github.com/unhcr-americas"><i class="fa fa-github fa-fw"></i>&nbsp; unhcr-americas</a>  and learn about __UnhcRverse packages__<br>
@@ -1123,12 +1400,39 @@ Slides created with [**remark.js**](http://remarkjs.com/) and the R package [**x
 
 .pull-right[
 
-<img src="images/giphy.gif" width="350px"/>
+<img src="images/giphy.gif" width="320px"/>
 
 ]
 
 
 ???
+
+
+
+Last, we hope that this session will motivate you to join the vibrant R users community in UNHCR and soon become an R champion. In order to make the most of the session, we would advise you to install the following open source environment: 
+
+    R - https://cran.r-project.org/bin/windows/base/ 
+
+    Rstudio Free version: https://www.rstudio.com/products/rstudio/download/ 
+
+    Create an account on Github - https://github.com/join?  and install Github desktop https://desktop.github.com/ 
+
+You may also start installing UNHCR Packages – following the instruction in their respective documentation published on Github: 
+
+    Use UNHCR Open data  - https://unhcr.github.io/unhcrdatapackage/docs/  
+
+    API to connect to internal data source - https://unhcr-web.github.io/hcrdata/docs/ 
+
+    Perform High Frequency Check https://unhcr.github.io/HighFrequencyChecks/docs/ 
+
+    Process data crunching for survey dataset - https://unhcr.github.io/koboloadeR/docs/  
+
+    Use UNHCR graphical template- https://unhcr-web.github.io/unhcRstyle/docs/ 
+
+See some practical tutorial on https://humanitarian-user-group.github.io/  
+
+The best way to start and learn is to have a concrete project! If you have one and need mentoring, we can liaise after the session. 
+
 Resources Ggplot:
 
 - [Ggplot main doc](https://ggplot2.tidyverse.org/index.html)
