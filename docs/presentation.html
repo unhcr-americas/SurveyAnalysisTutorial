@@ -292,11 +292,19 @@ Reference link on [Manipulating data](http://www.cookbook-r.com/Manipulating_dat
 
 .pull-right[
 
- Training / Certification on R language on [UNHCR Learn &amp; Connect- R training](https://unhcr.csod.com/ui/lms-learner-playlist/PlaylistDetails?playlistId=e90e2279-e3a4-4ef2-8b74-757f91d224b2) 
+Get a Certification on R language recognized by UNHCR on [learn.unhcr.org](https://unhcr.csod.com/ui/lms-learner-playlist/PlaylistDetails?playlistId=e90e2279-e3a4-4ef2-8b74-757f91d224b2) 
 
-[`UnhcrDataPackage`]() contains a library of charts
+Search and ask in [Stackoverflow](https://stackoverflow.com/questions/tagged/r)
 
-stackoverflow
+Go through [Cheat-sheets](https://rstudio.cloud/learn/cheat-sheets)
+
+Consult Key Manuals, maybe starting with [R for Data Science](https://r4ds.had.co.nz/)
+
+Browse chart library on [`UnhcrDataPackage`]() 
+
+Follow blogs like general [Rbloggers](https://www.r-bloggers.com/) or more specific [HumanitaRian-useR-group](https://humanitarian-user-group.github.io/) as well some twitter accounts.
+
+Join forum like [Inter-Agency R skype group](https://join.skype.com/qYBKC5q3wKp4) or Internal UNHCR Ms Discussion group (ask to join!).
 
 ]
 
@@ -320,15 +328,40 @@ https://r4ds.had.co.nz/graphics-for-communication.html#figure-sizing
 
 ---
 
-### Create a project and install required packages
+### Install required packages
 
 .pull-left[
 
+First create a new project within R studio
+
+
 ```r
+if (!require("tidyverse")) install.packages("tidyverse", dependencies = TRUE)
+library(tidyverse)
+  
+if (!require("unhcrdatapackage")) remotes::install_github('unhcr/unhcrdatapackage')
+library(unhcRstyle)
+
+if (!require("unhcRstyle")) remotes::install_github('unhcr-web/unhcRstyle')
+library(unhcRstyle)
+
+if (!require("ggplot2")) install.packages("ggplot2", dependencies = TRUE)
+library(ggplot2)
+
+if (!require("ggthemes")) install.packages("ggthemes", dependencies = TRUE)
+
+library(dplyr)
+library(haven) 
+library(sjlabelled)
+library(sjmisc) 
+library(sjPlot)
+library(ggrepel)
+library(Hmisc)
+library(ggthemes)
+
 library(tidyverse)
 library(scales)
 library(unhcrdatapackage)
-library(unhcRstyle)
 library(readxl)
 ```
 ]
@@ -901,6 +934,11 @@ library(Hmisc)
 library(ggplot2)
 library(ggthemes)
 library(here)
+
+
+if (!require("here")) install.packages("here", dependencies = TRUE)
+library(here) 
+
 # http://microdatos.dane.gov.co/index.php/catalog/718/get_microdata 
 ## Start with Household composition where disaggregation variables are
 data0 &lt;- haven::read_sav(here::here("data-raw", "Características y composición del hogar.sav"))
