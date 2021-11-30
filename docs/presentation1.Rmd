@@ -48,6 +48,8 @@ class: inverse, left, middle
 
 ???
 Slides made with Xaringan - - https://arm.rbind.io/slides/xaringan.html
+https://slides.earo.me/rladiesakl20/#1
+https://xaringantutorial.netlify.app
 
 ---
 
@@ -94,11 +96,9 @@ Depending on the pace of the group, if we do not finish today we will org anise 
 
 <i class="fa fa-check-square fa-fw fa-2x"></i> Use the __chat__ to send your questions - we are two facilitators and one is focused on replying all questions directly in the chat while the session is on-going
 
-<i class="fa fa-pencil  fa-fw fa-2x"></i> No need to take notes, all the session __content__ will be shared 
-
 <i class="fa fa-cog fa-fw fa-2x"></i> All practical exercises are designed to get you __testing the commands__:
 
-> Login on a dedicated cloud-based version of RStudio with base packages pre-installed for this session @ 
+> Start Rstudio if you have already it installed  or Login now to[cloud-based version of RStudio](https://login.rstudio.cloud/register?redirect=https%3A%2F%2Fclient.login.rstudio.cloud%2Foauth%2Flogin%3Fshow_auth%3D0%26show_login%3D0) for this session  
     
 > Paste the command from the chat to your online Rstudio session and check what is happening
     
@@ -577,8 +577,10 @@ Origin <- Origin %>%
 --
 
 .pull-right[
-```{r, echo=FALSE}
-knitr::kable(head(Origin), format = 'html')
+```{r, echo=FALSE} 
+#knitr::kable(head(Origin), format = 'html')
+DT::datatable(Origin,
+  fillContainer = FALSE, options = list(pageLength = 4))
 ```
 ]
 
@@ -601,11 +603,14 @@ Origin <- Origin %>%
 .pull-right[
 ```{r, echo=FALSE}
 knitr::kable(head(Origin), format = 'html')
+
+#DT::datatable(head(Origin, 10),
+#  fillContainer = FALSE, options = list(pageLength = 4))
 ```
 ]
 
-
 ---
+
 
 ### Reshape the data - 4 - Aggregate by Country of Origin
 
@@ -615,6 +620,9 @@ Origin <- Origin %>%
   group_by( CountryOriginName) %>% #<<
   summarise(DisplacedAcrossBorders = sum(Value) )  #<<
 
+# DT::datatable(Origin,
+#    fillContainer = FALSE, options = list(pageLength = 4))
+
 ```
 ]
 
@@ -622,7 +630,11 @@ Origin <- Origin %>%
 
 .pull-right[
 ```{r, echo=FALSE}
-knitr::kable(head(Origin), format = 'html')
+#knitr::kable(head(Origin), format = 'html')
+
+DT::datatable(Origin,
+  fillContainer = FALSE, options = list(pageLength = 4))
+
 ```
 ]
 
@@ -1759,100 +1771,9 @@ class: center, middle, inverse
 
 
 > __Question__: How is the perception of current situation compared to that of 5 years ago differs between the "undocumented Venezuelans" and the rest of the population? 
+ 
+See you in the R master webinar in January !
 
-
-.pull-left[
-
-Create Variable
-
-```{r , eval=FALSE, comment='#'}
-d <- left_join(persons, households) %>%
-  mutate( IllegalVenez = ifelse( (P1894 == "5" &
-                   P756S3 == "3"),
-                  paste("Venz_SinDocumento"), 
-                  paste("other")) )
-
-# table(d$IllegalVenez, useNA="ifany")
-```
-]
-
---
-
-.pull-right[
-```{r , echo=FALSE}
-d <- left_join(persons, households) %>%
-  mutate( IllegalVenez = ifelse( (P1894 == "5" &
-                   P756S3 == "3"),
-                  paste("Venz_SinDocumento"), 
-                  paste("other")) )
-
-table(d$IllegalVenez, useNA="ifany")
-```
-]
-
-???
-
----
-## Statistical association analysis: Crosstabulation & Assocation
-
-
-.pull-left[
-
-and the chart
-
-```{r , eval=FALSE, comment='#'}
-sjPlot::plot_xtab(x= d$P9050,
-                  grp = d$IllegalVenez,
-                  type = "bar" ,
-                  weight.by = as.numeric(d$FEX_C),
-                  # sort.frq =  "asc",
-                  # bar.pos = "stack",
-                  wrap.labels = 40,
-                  show.n = FALSE,
-                  show.total = FALSE,
-                  show.summary = TRUE,
-                  show.prc = FALSE,
-                 # summary.pos = "r",
-                  coord.flip = TRUE) +
-        labs(title = paste0(sjlabelled::get_label(households$P9050)),
-             subtitle = "Crossed with Documentation Status",
-             x = "",
-             y = "",
-             caption = "Source: Encuesta Nacional de Calidad de Vida ECV 2020, Colombia, DANE")
-
-
-```
-]
-
---
-
-.pull-right[
-```{r , echo=FALSE}
-# sjPlot::plot_xtab(x= d$P9050,
-#                   grp = d$IllegalVenez,
-#                   type = "bar" ,
-#                   weight.by = as.numeric(d$FEX_C),
-#                   # sort.frq =  "asc",
-#                   # bar.pos = "stack",
-#                   wrap.labels = 40,
-#                   show.n = FALSE,
-#                   show.total = FALSE,
-#                   show.summary = TRUE,
-#                   show.prc = FALSE,
-#                  # summary.pos = "r",
-#                   coord.flip = TRUE) +
-#         theme(#legend.position = "none",
-#               panel.grid.major.x  = element_line(color = "#cbcbcb"),
-#               panel.grid.major.y  = element_blank(),
-#               panel.grid.minor = element_blank()) +
-#         labs(title = paste0(sjlabelled::get_label(households$P9050)),
-#              subtitle = "Crossed with Documentation Status",
-#              x = "",
-#              y = "",
-#              caption = "Source: Encuesta Nacional de Calidad de Vida ECV 2020, Colombia, DANE")
-
-```
-]
 
 ???
 
