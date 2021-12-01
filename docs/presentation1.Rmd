@@ -571,7 +571,15 @@ nrow(Origin) # Number of Rows before filter
 # allows us to pass the result of one function/argument to the other one in sequence
 # assigning each functional output as an argument to the next one, and so on
 Origin <- Origin %>%
+  
+  ## First handling functions.. #<<
   filter( #<<
+  # Other handling functions includes: 
+  # arrange, at_least, chop, combine, dissolve, filter, 
+  # mutate, rename, rm_uncomplete, rw_fac, sample_frac,
+  # sample_n, select, slice, subset.Coo
+  ## https://dplyr.tidyverse.org/reference/index.html
+    
     ## we will use the 4 filters below
     CountryAsylumName  == "Panama" & 
     UNHCRBureau == "Americas" &
@@ -723,12 +731,11 @@ plot <- ggplot(data = Origin,
   
   # here we configure that it will be bar chart    
   geom_bar(
-           ## indicate how data should be summarised... 
-           # default behavior is to count the rows for each x value (i.e. stat = "count")
-           # stat = "identity" in geom_bar() tells ggplot2 to skip the aggregation
-           # aka you provided the y values - an alternative is to use geom_col
            stat = "identity", 
-           ## indicate the color to use to fill the bar - unhcr blue obviously!
+## indicate how data should be summarised... 
+# default behavior is to count the rows for each x value # stat = "identity" tells ggplot2 to skip aggregation
+# An alternative is to use geom_col
+## indicate the color to use to fill the bar 
            fill = "#0072bc")  
 
 ## Print the plot!!
@@ -1462,11 +1469,18 @@ class(datasets)
 ```{r , eval=FALSE, comment='#'}
 # Bind together datasets with the same unit of analysis
 persons <- datasets %>% 
+  # keep() is similar to Filter() but 
+  # can be applied to a list object 
+  ## Records available for individual are sorted with a 
+  # combination of code within the sequence variable
            keep(~!all(.$SECUENCIA_P == 1) &
                   !all(.$SECUENCIA_ENCUESTA == 1)) %>% 
-           reduce(full_join)
+  ## Iteratively applying a binary function, i.e loop...
+           reduce(
+  ## Perform multiple left joins 
+             full_join)
 
-# harmonize key variables - 
+# harmonize key variables by renaming them 
 # notice how SECUENCIA_ENCUESTA changes meaning between datasets
 persons <- persons %>% 
            rename(dwelling = DIRECTORIO, 
@@ -1515,6 +1529,10 @@ ncol(persons)
 ```{r , eval=FALSE, comment='#'}
 
 households <- datasets %>% 
+  
+  ## Records available for Household are sorted with a 
+  # combination of code within the sequence variable
+  
               keep(~all(.$SECUENCIA_P == 1) & 
                      !all(.$SECUENCIA_ENCUESTA == 1)) %>% 
               reduce(full_join)
@@ -1591,22 +1609,30 @@ table(data$pop, useNA = "ifany")
  
 ---
 
-### Create Indicators - Proportion of PoC living below the national poverty line
+### Create Indicators 
 
 .pull-left[
 
 ```{r , eval=FALSE, comment='#'}
-indicators <-   left_join(persons, households) %>% 
+indicators1 <-   left_join(persons, households) %>% 
+  
+  # transmute function returns the same new variable as mutate.
+  # However, it does not retain our original data!
   transmute(pop = case_when(is.na(P756S3) ~ "Colombians",
                             P756S3 == "Venezuela" ~ "Venezuelans",
                             TRUE ~ "Others"),
             
-            # 2.1 Proportion of PoC living below the national poverty line
+    # 2.1 Proportion of PoC living below the national poverty line
             rbm2.1 = PERCAPITA < 327674,
+    # 2.3 Proportion of PoC with access to health services
+            rbm2.3 = if_else(P5665 == "Sí", 
+                             is.na(P6153), 
+                             NA),
+            
             dpto = "dummy", # FIXME: should be dwellings$dpto,
             wt = FEX_C)   
 
-#knitr::kable(head(indicators %>%
+#knitr::kable(head(indicators1 %>%
 #                    select(pop, rbm2.1 )),
 #             format = 'html')
 ```
@@ -1616,18 +1642,22 @@ indicators <-   left_join(persons, households) %>%
 
 .pull-right[
 ```{r , echo=FALSE}
-indicators <-   left_join(persons, households) %>% 
+indicators1 <-   left_join(persons, households) %>% 
   transmute(pop = case_when(is.na(P756S3) ~ "Colombians",
                             P756S3 == "Venezuela" ~ "Venezuelans",
                             TRUE ~ "Others"),
             
             # 2.1 Proportion of PoC living below the national poverty line
             rbm2.1 = PERCAPITA < 327674,
+    # 2.3 Proportion of PoC with access to health services
+            rbm2.3 = if_else(P5665 == "Sí", 
+                             is.na(P6153), 
+                             NA),
             dpto = "dummy", # FIXME: should be dwellings$dpto,
             wt = FEX_C)  
 
-knitr::kable(head(indicators %>%
-                    select(pop, rbm2.1, rbm2.2, rbm2.3 )),
+knitr::kable(head(indicators1 %>%
+                    select(pop, rbm2.1, rbm2.3 )),
              format = 'html')
 
 ```
@@ -1635,18 +1665,17 @@ knitr::kable(head(indicators %>%
 
 ???
 
-### Create Indicators
+---
+
+### Add Indicators from multiple variables
 
 .pull-left[
 
 ```{r , eval=FALSE, comment='#'}
-indicators <-   left_join(persons, households) %>% 
+indicators2 <-   left_join(persons, households) %>% 
   transmute(pop = case_when(is.na(P756S3) ~ "Colombians",
                             P756S3 == "Venezuela" ~ "Venezuelans",
                             TRUE ~ "Others"),
-            
-            # 2.1 Proportion of PoC living below the national poverty line
-            rbm2.1 = PERCAPITA < 327674, 
             
             water = P792 != "No tienen el servicio",
             sanitation = P5032 != "No tienen el servicio",
@@ -1658,16 +1687,13 @@ indicators <-   left_join(persons, households) %>%
             housing_durability = TRUE, # FIXME: correct when we get the missing data file
        
             # 2.2 Proportion of PoCs residing in physically safe and secure settlements 
-            # with access to basic facilities
             rbm2.2 = water & sanitation & !overcrowding & housing_durability & secure_tenure,
             
-            # 2.3 Proportion of PoC with access to health services
-            rbm2.3 = if_else(P5665 == "Sí", is.na(P6153), NA),
             dpto = "dummy", # FIXME: should be dwellings$dpto,
             wt = FEX_C)   
 
 #knitr::kable(head(indicators %>%
-#                    select(pop, rbm2.1, rbm2.2, rbm2.3 )),
+#                    select(pop, rbm2.2, wt )),
 #             format = 'html')
 ```
 ]
@@ -1676,13 +1702,10 @@ indicators <-   left_join(persons, households) %>%
 
 .pull-right[
 ```{r , echo=FALSE}
-indicators <-   left_join(persons, households) %>% 
+indicators2 <-   left_join(persons, households) %>% 
   transmute(pop = case_when(is.na(P756S3) ~ "Colombians",
                             P756S3 == "Venezuela" ~ "Venezuelans",
                             TRUE ~ "Others"),
-            
-            # 2.1 Proportion of PoC living below the national poverty line
-            rbm2.1 = PERCAPITA < 327674, 
             
             water = P792 != "No tienen el servicio",
             sanitation = P5032 != "No tienen el servicio",
@@ -1696,14 +1719,11 @@ indicators <-   left_join(persons, households) %>%
             # 2.2 Proportion of PoCs residing in physically safe and secure settlements 
             # with access to basic facilities
             rbm2.2 = water & sanitation & !overcrowding & housing_durability & secure_tenure,
-            
-            # 2.3 Proportion of PoC with access to health services
-            rbm2.3 = if_else(P5665 == "Sí", is.na(P6153), NA),
             dpto = "dummy", # FIXME: should be dwellings$dpto,
             wt = FEX_C)  
 
-knitr::kable(head(indicators %>%
-                    select(pop, rbm2.1, rbm2.2, rbm2.3 )),
+knitr::kable(head(indicators2 %>%
+                    select(pop, rbm2.2, wt)),
              format = 'html')
 
 ```
@@ -1711,83 +1731,6 @@ knitr::kable(head(indicators %>%
 
 ???
 
-
-### Create Indicators
-
-.pull-left[
-
-```{r , eval=FALSE, comment='#'}
-indicators <-   left_join(persons, households) %>% 
-  transmute(pop = case_when(is.na(P756S3) ~ "Colombians",
-                            P756S3 == "Venezuela" ~ "Venezuelans",
-                            TRUE ~ "Others"),
-            
-            # 2.1 Proportion of PoC living below the national poverty line
-            rbm2.1 = PERCAPITA < 327674, 
-            
-            water = P792 != "No tienen el servicio",
-            sanitation = P5032 != "No tienen el servicio",
-            overcrowding = CANT_PERSONAS_HOGAR/P5000 > 3,
-            secure_tenure = 
-              P5095 == "Propia, totalmente pagada" |
-              P5095 == "Propia, lo están pagando" |
-              (P5095 == "En arriendo o subarriendo" & P3006 == "Escrito"),
-            housing_durability = TRUE, # FIXME: correct when we get the missing data file
-       
-            # 2.2 Proportion of PoCs residing in physically safe and secure settlements 
-            # with access to basic facilities
-            rbm2.2 = water & sanitation & !overcrowding & housing_durability & secure_tenure,
-            
-            # 2.3 Proportion of PoC with access to health services
-            rbm2.3 = if_else(P5665 == "Sí", is.na(P6153), NA),
-            dpto = "dummy", # FIXME: should be dwellings$dpto,
-            wt = FEX_C)   
-
-#knitr::kable(head(indicators %>%
-#                    select(pop, rbm2.1, rbm2.2, rbm2.3 )),
-#             format = 'html')
-```
-]
-
---
-
-.pull-right[
-```{r , echo=FALSE}
-indicators <-   left_join(persons, households) %>% 
-  transmute(pop = case_when(is.na(P756S3) ~ "Colombians",
-                            P756S3 == "Venezuela" ~ "Venezuelans",
-                            TRUE ~ "Others"),
-            
-            # 2.1 Proportion of PoC living below the national poverty line
-            rbm2.1 = PERCAPITA < 327674, 
-            
-            water = P792 != "No tienen el servicio",
-            sanitation = P5032 != "No tienen el servicio",
-            overcrowding = CANT_PERSONAS_HOGAR/P5000 > 3,
-            secure_tenure = 
-              P5095 == "Propia, totalmente pagada" |
-              P5095 == "Propia, lo están pagando" |
-              (P5095 == "En arriendo o subarriendo" & P3006 == "Escrito"),
-            housing_durability = TRUE, # FIXME: correct when we get the missing data file
-       
-            # 2.2 Proportion of PoCs residing in physically safe and secure settlements 
-            # with access to basic facilities
-            rbm2.2 = water & sanitation & !overcrowding & housing_durability & secure_tenure,
-            
-            # 2.3 Proportion of PoC with access to health services
-            rbm2.3 = if_else(P5665 == "Sí", is.na(P6153), NA),
-            dpto = "dummy", # FIXME: should be dwellings$dpto,
-            wt = FEX_C)  
-
-knitr::kable(head(indicators %>%
-                    select(pop, rbm2.1, rbm2.2, rbm2.3 )),
-             format = 'html')
-
-```
-]
-
-???
-  
 
  
 ---
@@ -1797,7 +1740,46 @@ knitr::kable(head(indicators %>%
 .pull-left[
 
 ```{r , eval=FALSE, comment='#'}
-indicators <-  indicators   %>%
+indicators.computed   <- 
+        ## get all indicators joined
+        dplyr::left_join(x= indicators1,
+                         y =indicators2)    %>%
+        ## Remove the neither colombian nor venezuelan
+        filter(pop != "Others") %>% 
+         
+        ## transform in a weighted survey object
+         srvyr::as_survey_design(strata = dpto, 
+                          weights = wt) %>% 
+         ## Compile indicators by group
+         group_by(pop) %>% 
+         summarize(
+      # Apply functions across multiple columns
+           across(
+           ## select all variable name based on 
+           ## name pattern
+             contains("rbm"), 
+                          srvyr::survey_mean, 
+          
+             # Report variability as confidence interval ("ci")
+                          vartype = "ci", 
+             # missing values should be dropped
+                          na.rm = TRUE,
+             ## append a suffix to all column name to 
+             # distinguish the mai estimation from CI
+                          .names = "{.col}_est")) 
+
+```
+]
+
+
+--
+
+.pull-right[
+```{r , echo=FALSE}
+indicators.computed <- 
+        ## get all indicators joined
+        dplyr::left_join(x= indicators1,
+                               y =indicators2)   %>%
         ## Remove the neither colombian nor venezuelan
         filter(pop != "Others") %>% 
          
@@ -1810,11 +1792,31 @@ indicators <-  indicators   %>%
                           srvyr::survey_mean, 
                           vartype = "ci", 
                           na.rm = TRUE,
-                          .names = "{.col}_est")) %>% 
-         pivot_longer(-pop, 
+                          .names = "{.col}_est")) 
+
+knitr::kable(head(indicators.computed %>%
+                    select(pop, rbm2.2_est, rbm2.2_est_low )), format = 'html')
+
+```
+]
+
+???
+ 
+---
+
+### Pivot Frame
+
+.pull-left[
+
+```{r , eval=FALSE, comment='#'}
+indicators <- indicators.computed   %>%
+          ## pivot from wide to long using variable pop
+          pivot_longer(-pop, 
                       names_to = c("ind", ".value"), 
                       names_pattern = "(.+?)_(.+)")
 
+# Save indicators in a csv file
+# write.csv(indicators, "indicators.csv")
 # knitr::kable(head(indicators %>%
 #                    select(pop, ind, est )), format = 'html')
 
@@ -1826,26 +1828,16 @@ indicators <-  indicators   %>%
 
 .pull-right[
 ```{r , echo=FALSE}
-indicators <-  indicators   %>%
-        ## Remove the neither colombian nor venezuelan
-        filter(pop != "Others") %>% 
-         
-        ## transform in a srvey weighter dataset
-         srvyr::as_survey_design(strata = dpto, 
-                          weights = wt) %>% 
-         ## Compile indicators by group
-         group_by(pop) %>% 
-         summarize(across(contains("rbm"), 
-                          srvyr::survey_mean, 
-                          vartype = "ci", 
-                          na.rm = TRUE,
-                          .names = "{.col}_est")) %>% 
-         pivot_longer(-pop, 
+indicators <- indicators.computed   %>%
+          ## pivot from wide to long using variable pop
+          pivot_longer(-pop, 
                       names_to = c("ind", ".value"), 
                       names_pattern = "(.+?)_(.+)")
 
+ 
+
 knitr::kable(head(indicators %>%
-                    select(pop, ind, est )), format = 'html')
+                    select(pop, ind, est ),6), format = 'html')
 
 ```
 ]
@@ -1855,7 +1847,82 @@ knitr::kable(head(indicators %>%
 
 ---
 
-### Generate chart
+### Build chart
+
+.pull-left[
+
+```{r , eval=FALSE, comment='#'}
+plot <- ggplot( data = indicators,
+                aes( x= est, 
+                     y = fct_rev(ind))) +
+  geom_pointrange(aes(xmin = est_low, 
+                      xmax = est_upp, 
+                      color = pop), 
+                       size = .75) +
+  geom_text(aes(label = scales::label_percent(.1)(est)), 
+                 vjust = -1.25) 
+plot
+```
+]
+
+--
+
+.pull-right[
+```{r , echo=FALSE}
+plot <- ggplot( data = indicators,
+                aes( x= est, 
+                     y = fct_rev(ind))) +
+  geom_pointrange(aes(xmin = est_low, 
+                      xmax = est_upp, 
+                      color = pop), 
+                       size = .75) +
+  geom_text(aes(label = scales::label_percent(.1)(est)), 
+                 vjust = -1.25) 
+plot
+```
+]
+
+???
+
+
+---
+
+### Add scale
+
+.pull-left[
+
+```{r , eval=FALSE, comment='#'}
+plot <- plot +
+  scale_x_continuous(labels = scales::label_percent(), 
+                     limits = c(0, 1), 
+                     breaks = c(0, .5, 1)) +
+  scale_color_manual(values = c(Colombians = "black", Venezuelans = "#0072BC")) 
+
+plot
+```
+]
+
+--
+
+.pull-right[
+```{r , echo=FALSE}
+plot <- plot +
+  scale_x_continuous(labels = scales::label_percent(), 
+                     limits = c(0, 1), 
+                     breaks = c(0, .5, 1)) +
+  scale_color_manual(values = c(Colombians = "black", Venezuelans = "#0072BC")) 
+
+plot
+```
+]
+
+???
+
+
+
+---
+
+### Change labels
 
 .pull-left[
 
@@ -1866,26 +1933,9 @@ rbm_indicators <-
     rbm2.2 = "2.2 Proportion of PoCs residing in physically safe and secure settlements with access to basic facilities.",
     rbm2.3 = "2.3 Proportion of PoC with access to health services")
 
-ggplot( data = indicators,
-  aes(est, fct_rev(ind))) +
-  geom_pointrange(aes(xmin = est_low, 
-                      xmax = est_upp, 
-                      color = pop), 
-                  size = .75) +
-  geom_text(aes(label = scales::label_percent(.1)(est)), 
-                 vjust = -1.25) +
-  scale_x_continuous(labels = scales::label_percent(), 
-                     limits = c(0, 1), 
-                     breaks = c(0, .5, 1)) +
-  scale_y_discrete(labels = str_wrap(rev(rbm_indicators), 40)) +
-  scale_color_manual(values = c(Colombians = "black", Venezuelans = "#0072BC")) +
-  labs(x = "Estimate", y = "",
-       title = "Impact Area 2: Realizing Rights in Safe Environments",
-       caption = glue::glue("Encuesta Nacional de Calidad de Vida (ECV) 2020\n",
-                            "# of Venezuelans = {scales::label_comma()(sum(data$pop=='Venezuelans'))} obs. ",
-                            "({scales::label_number_si(.1)(sum((data$pop=='Venezuelans')*data$wt))} weighted)")) +
-  unhcRstyle::unhcr_theme(base = 8) +
-  theme(panel.grid.minor.x = element_blank())
+plot <- plot +
+  scale_y_discrete(labels = str_wrap(rev(rbm_indicators), 40)) 
+plot
 ```
 ]
 
@@ -1894,38 +1944,75 @@ ggplot( data = indicators,
 .pull-right[
 ```{r , echo=FALSE}
 ## Add labels for each calculated indicators
-rbm_indicaors <- 
+rbm_indicators <- 
   c(rbm2.1 = "2.1 Proportion of PoC living below the national poverty line",
     rbm2.2 = "2.2 Proportion of PoCs residing in physically safe and secure settlements with access to basic facilities.",
     rbm2.3 = "2.3 Proportion of PoC with access to health services")
 
+plot <- plot + 
+  scale_y_discrete(labels = str_wrap(rev(rbm_indicators), 40)) 
 
-ggplot( data = indicators,
-  aes(est, fct_rev(ind))) +
-  geom_pointrange(aes(xmin = est_low, 
-                      xmax = est_upp, 
-                      color = pop), 
-                  size = .75) +
-  geom_text(aes(label = scales::label_percent(.1)(est)), 
-                 vjust = -1.25) +
-  scale_x_continuous(labels = scales::label_percent(), 
-                     limits = c(0, 1), 
-                     breaks = c(0, .5, 1)) +
-  scale_y_discrete(labels = str_wrap(rev(rbm_indicaors), 40)) +
-  scale_color_manual(values = c(Colombians = "black", Venezuelans = "#0072BC")) +
-  labs(x = "estimate", 
-       y = "indicator",
+plot
+```
+]
+
+???
+
+
+---
+
+### Title and Style
+
+.pull-left[
+
+```{r , eval=FALSE, comment='#'}
+plot <- plot + 
+ labs(x = "Estimate", y = "",
        title = "Impact Area 2: Realizing Rights in Safe Environments",
        caption = glue::glue("Encuesta Nacional de Calidad de Vida (ECV) 2020\n",
                             "# of Venezuelans = {scales::label_comma()(sum(data$pop=='Venezuelans'))} obs. ",
                             "({scales::label_number_si(.1)(sum((data$pop=='Venezuelans')*data$wt))} weighted)")) +
   unhcRstyle::unhcr_theme() +
   theme(panel.grid.minor.x = element_blank())
+
+plot
+```
+]
+
+--
+
+.pull-right[
+```{r , echo=FALSE}
+plot <- plot + 
+ labs(x = "Estimate", y = "",
+       title = "Impact Area 2: Realizing Rights in Safe Environments",
+       caption = glue::glue("Encuesta Nacional de Calidad de Vida (ECV) 2020\n",
+                            "# of Venezuelans = {scales::label_comma()(sum(data$pop=='Venezuelans'))} obs. ",
+                            "({scales::label_number_si(.1)(sum((data$pop=='Venezuelans')*data$wt))} weighted)")) +
+  unhcRstyle::unhcr_theme( ) +
+  theme(panel.grid.minor.x = element_blank())
+
+plot
 ```
 ]
 
 ???
 
+---
+
+## Congrat!
+
+Today you learn the basics! 
+
+ * Objects are __words__
+ * Functions are __verbs__ used to transform object
+ * Charts are  __complement__ created with the __grammar__ of graphics
+
+???
+
+In grammar, a complement is a word, phrase, or clause that is necessary to complete the meaning of a given expression. Complements are often also arguments 
+
+---
 class: center, middle, inverse
 
 
@@ -1973,8 +2060,8 @@ class: left, top
 .pull-left[
 
 __DIMA Americas__: <br>
-Edouard Legoupil, _Snr Statistics & Data Analysis Officer_, <a href="mailto:legoupil@unhcr.org"><i class="fa fa-paper-plane fa-fw"></i>&nbsp; legoupil@unhcr.org</a> | <a href="http://twitter.com/edouard_lgp"><i class="fa fa-twitter fa-fw"></i>&nbsp; @edouard_lgp</a> <br> 
-Hisham Galal, _Associate Statistics & Data Analysis Officer_, <a href="mailto:galal@unhcr.org"><i class="fa fa-paper-plane fa-fw"></i>&nbsp; galal@unhcr.org</a>
+Edouard Legoupil, _Snr Statistics & Data Analysis Officer_,<br>  <a href="mailto:legoupil@unhcr.org"><i class="fa fa-paper-plane fa-fw"></i>&nbsp; legoupil@unhcr.org</a>  <br> 
+Hisham Galal, _Associate Statistics & Data Analysis Officer_,<br>  <a href="mailto:galal@unhcr.org"><i class="fa fa-paper-plane fa-fw"></i>&nbsp; galal@unhcr.org</a>
 
 
 Check our github @ <a href="http://github.com/unhcr-americas"><i class="fa fa-github fa-fw"></i>&nbsp;unhcr-americas</a>  and learn about __UnhcRverse packages__<br>

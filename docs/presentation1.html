@@ -578,7 +578,15 @@ nrow(Origin) # Number of Rows before filter
 # allows us to pass the result of one function/argument to the other one in sequence
 # assigning each functional output as an argument to the next one, and so on
 Origin &lt;- Origin %&gt;%
+  
+* ## First handling functions..
 * filter(
+  # Other handling functions includes: 
+  # arrange, at_least, chop, combine, dissolve, filter, 
+  # mutate, rename, rm_uncomplete, rw_fac, sample_frac,
+  # sample_n, select, slice, subset.Coo
+  ## https://dplyr.tidyverse.org/reference/index.html
+    
     ## we will use the 4 filters below
     CountryAsylumName  == "Panama" &amp; 
     UNHCRBureau == "Americas" &amp;
@@ -818,12 +826,11 @@ plot &lt;- ggplot(data = Origin,
   
   # here we configure that it will be bar chart    
   geom_bar(
-           ## indicate how data should be summarised... 
-           # default behavior is to count the rows for each x value (i.e. stat = "count")
-           # stat = "identity" in geom_bar() tells ggplot2 to skip the aggregation
-           # aka you provided the y values - an alternative is to use geom_col
            stat = "identity", 
-           ## indicate the color to use to fill the bar - unhcr blue obviously!
+## indicate how data should be summarised... 
+# default behavior is to count the rows for each x value # stat = "identity" tells ggplot2 to skip aggregation
+# An alternative is to use geom_col
+## indicate the color to use to fill the bar 
            fill = "#0072bc")  
 
 ## Print the plot!!
@@ -1674,11 +1681,18 @@ datasets &lt;- datasetlist %&gt;%
 ```r
 # Bind together datasets with the same unit of analysis
 persons &lt;- datasets %&gt;% 
+  # keep() is similar to Filter() but 
+  # can be applied to a list object 
+  ## Records available for individual are sorted with a 
+  # combination of code within the sequence variable
            keep(~!all(.$SECUENCIA_P == 1) &amp;
                   !all(.$SECUENCIA_ENCUESTA == 1)) %&gt;% 
-           reduce(full_join)
+  ## Iteratively applying a binary function, i.e loop...
+           reduce(
+  ## Perform multiple left joins 
+             full_join)
 
-# harmonize key variables - 
+# harmonize key variables by renaming them 
 # notice how SECUENCIA_ENCUESTA changes meaning between datasets
 persons &lt;- persons %&gt;% 
            rename(dwelling = DIRECTORIO, 
@@ -1713,6 +1727,10 @@ persons &lt;- persons %&gt;%
 
 ```r
 households &lt;- datasets %&gt;% 
+  
+  ## Records available for Household are sorted with a 
+  # combination of code within the sequence variable
+  
               keep(~all(.$SECUENCIA_P == 1) &amp; 
                      !all(.$SECUENCIA_ENCUESTA == 1)) %&gt;% 
               reduce(full_join)
@@ -1777,40 +1795,32 @@ data &lt;-
  
 ---
 
-### Create Indicators
+### Create Indicators 
 
 .pull-left[
 
 
 ```r
-indicators &lt;-   left_join(persons, households) %&gt;% 
+indicators1 &lt;-   left_join(persons, households) %&gt;% 
+  
+  # transmute function returns the same new variable as mutate.
+  # However, it does not retain our original data!
   transmute(pop = case_when(is.na(P756S3) ~ "Colombians",
                             P756S3 == "Venezuela" ~ "Venezuelans",
                             TRUE ~ "Others"),
             
-            # 2.1 Proportion of PoC living below the national poverty line
-            rbm2.1 = PERCAPITA &lt; 327674, 
+    # 2.1 Proportion of PoC living below the national poverty line
+            rbm2.1 = PERCAPITA &lt; 327674,
+    # 2.3 Proportion of PoC with access to health services
+            rbm2.3 = if_else(P5665 == "Sí", 
+                             is.na(P6153), 
+                             NA),
             
-            water = P792 != "No tienen el servicio",
-            sanitation = P5032 != "No tienen el servicio",
-            overcrowding = CANT_PERSONAS_HOGAR/P5000 &gt; 3,
-            secure_tenure = 
-              P5095 == "Propia, totalmente pagada" |
-              P5095 == "Propia, lo están pagando" |
-              (P5095 == "En arriendo o subarriendo" &amp; P3006 == "Escrito"),
-            housing_durability = TRUE, # FIXME: correct when we get the missing data file
-       
-            # 2.2 Proportion of PoCs residing in physically safe and secure settlements 
-            # with access to basic facilities
-            rbm2.2 = water &amp; sanitation &amp; !overcrowding &amp; housing_durability &amp; secure_tenure,
-            
-            # 2.3 Proportion of PoC with access to health services
-            rbm2.3 = if_else(P5665 == "Sí", is.na(P6153), NA),
             dpto = "dummy", # FIXME: should be dwellings$dpto,
             wt = FEX_C)   
 
-#knitr::kable(head(indicators %&gt;%
-#                    select(pop, rbm2.1, rbm2.2, rbm2.3 )),
+#knitr::kable(head(indicators1 %&gt;%
+#                    select(pop, rbm2.1 )),
 #             format = 'html')
 ```
 ]
@@ -1823,7 +1833,6 @@ indicators &lt;-   left_join(persons, households) %&gt;%
   &lt;tr&gt;
    &lt;th style="text-align:left;"&gt; pop &lt;/th&gt;
    &lt;th style="text-align:left;"&gt; rbm2.1 &lt;/th&gt;
-   &lt;th style="text-align:left;"&gt; rbm2.2 &lt;/th&gt;
    &lt;th style="text-align:left;"&gt; rbm2.3 &lt;/th&gt;
   &lt;/tr&gt;
  &lt;/thead&gt;
@@ -1831,37 +1840,31 @@ indicators &lt;-   left_join(persons, households) %&gt;%
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Colombians &lt;/td&gt;
    &lt;td style="text-align:left;"&gt; TRUE &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Colombians &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; FALSE &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Colombians &lt;/td&gt;
    &lt;td style="text-align:left;"&gt; TRUE &lt;/td&gt;
    &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Colombians &lt;/td&gt;
    &lt;td style="text-align:left;"&gt; FALSE &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; TRUE &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Colombians &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; TRUE &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; TRUE &lt;/td&gt;
    &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Colombians &lt;/td&gt;
    &lt;td style="text-align:left;"&gt; FALSE &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; TRUE &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Colombians &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; FALSE &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; TRUE &lt;/td&gt;
    &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Colombians &lt;/td&gt;
    &lt;td style="text-align:left;"&gt; TRUE &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; FALSE &lt;/td&gt;
    &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
   &lt;/tr&gt;
 &lt;/tbody&gt;
@@ -1869,6 +1872,90 @@ indicators &lt;-   left_join(persons, households) %&gt;%
 ]
 
 ???
+
+---
+
+### Add Indicators from multiple variables
+
+.pull-left[
+
+
+```r
+indicators2 &lt;-   left_join(persons, households) %&gt;% 
+  transmute(pop = case_when(is.na(P756S3) ~ "Colombians",
+                            P756S3 == "Venezuela" ~ "Venezuelans",
+                            TRUE ~ "Others"),
+            
+            water = P792 != "No tienen el servicio",
+            sanitation = P5032 != "No tienen el servicio",
+            overcrowding = CANT_PERSONAS_HOGAR/P5000 &gt; 3,
+            secure_tenure = 
+              P5095 == "Propia, totalmente pagada" |
+              P5095 == "Propia, lo están pagando" |
+              (P5095 == "En arriendo o subarriendo" &amp; P3006 == "Escrito"),
+            housing_durability = TRUE, # FIXME: correct when we get the missing data file
+       
+            # 2.2 Proportion of PoCs residing in physically safe and secure settlements 
+            rbm2.2 = water &amp; sanitation &amp; !overcrowding &amp; housing_durability &amp; secure_tenure,
+            
+            dpto = "dummy", # FIXME: should be dwellings$dpto,
+            wt = FEX_C)   
+
+#knitr::kable(head(indicators %&gt;%
+#                    select(pop, rbm2.2, wt )),
+#             format = 'html')
+```
+]
+
+--
+
+.pull-right[
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; pop &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; rbm2.2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; wt &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Colombians &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; TRUE &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 438.1767 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Colombians &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; TRUE &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 495.8612 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Colombians &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; TRUE &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 440.2299 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Colombians &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; TRUE &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 466.8462 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Colombians &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; TRUE &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 466.8462 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Colombians &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; FALSE &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 466.4742 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+
+???
+
+
  
 ---
 
@@ -1878,28 +1965,86 @@ indicators &lt;-   left_join(persons, households) %&gt;%
 
 
 ```r
-indicators &lt;-  indicators   %&gt;%
+indicators.computed   &lt;- 
+        ## get all indicators joined
+        dplyr::left_join(x= indicators1,
+                         y =indicators2)    %&gt;%
         ## Remove the neither colombian nor venezuelan
         filter(pop != "Others") %&gt;% 
          
-        ## transform in a srvey weighter dataset
+        ## transform in a weighted survey object
          srvyr::as_survey_design(strata = dpto, 
                           weights = wt) %&gt;% 
          ## Compile indicators by group
          group_by(pop) %&gt;% 
-         summarize(across(contains("rbm"), 
+         summarize(
+      # Apply functions across multiple columns
+           across(
+           ## select all variable name based on 
+           ## name pattern
+             contains("rbm"), 
                           srvyr::survey_mean, 
+          
+             # Report variability as confidence interval ("ci")
                           vartype = "ci", 
+             # missing values should be dropped
                           na.rm = TRUE,
-                          .names = "{.col}_est")) %&gt;% 
-         pivot_longer(-pop, 
+             ## append a suffix to all column name to 
+             # distinguish the mai estimation from CI
+                          .names = "{.col}_est")) 
+```
+]
+
+
+--
+
+.pull-right[
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; pop &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; rbm2.2_est &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; rbm2.2_est_low &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Colombians &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.5501188 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.5490104 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Venezuelans &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.2246054 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.2161841 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+
+???
+ 
+---
+
+### Pivot Frame
+
+.pull-left[
+
+
+```r
+indicators &lt;- indicators.computed   %&gt;%
+          ## pivot from wide to long using variable pop
+          pivot_longer(-pop, 
                       names_to = c("ind", ".value"), 
                       names_pattern = "(.+?)_(.+)")
 
+# Save indicators in a csv file
+# write.csv(indicators, "indicators.csv")
 # knitr::kable(head(indicators %&gt;%
 #                    select(pop, ind, est )), format = 'html')
 ```
 ]
+
 
 --
 
@@ -1916,32 +2061,22 @@ indicators &lt;-  indicators   %&gt;%
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Colombians &lt;/td&gt;
    &lt;td style="text-align:left;"&gt; rbm2.1 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.4222928 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.3027933 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Colombians &lt;/td&gt;
    &lt;td style="text-align:left;"&gt; rbm2.2 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.4569634 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Colombians &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; rbm2.3 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.6829687 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.5501188 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Venezuelans &lt;/td&gt;
    &lt;td style="text-align:left;"&gt; rbm2.1 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.6296320 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.6496214 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Venezuelans &lt;/td&gt;
    &lt;td style="text-align:left;"&gt; rbm2.2 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.2279873 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Venezuelans &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; rbm2.3 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.4305851 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.2246054 &lt;/td&gt;
   &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
@@ -1952,7 +2087,65 @@ indicators &lt;-  indicators   %&gt;%
 
 ---
 
-### Generate chart
+### Build chart
+
+.pull-left[
+
+
+```r
+plot &lt;- ggplot( data = indicators,
+                aes( x= est, 
+                     y = fct_rev(ind))) +
+  geom_pointrange(aes(xmin = est_low, 
+                      xmax = est_upp, 
+                      color = pop), 
+                       size = .75) +
+  geom_text(aes(label = scales::label_percent(.1)(est)), 
+                 vjust = -1.25) 
+plot
+```
+]
+
+--
+
+.pull-right[
+&lt;img src="presentation1_files/figure-html/unnamed-chunk-58-1.png" width="1080" /&gt;
+]
+
+???
+
+
+---
+
+### Add scale
+
+.pull-left[
+
+
+```r
+plot &lt;- plot +
+  scale_x_continuous(labels = scales::label_percent(), 
+                     limits = c(0, 1), 
+                     breaks = c(0, .5, 1)) +
+  scale_color_manual(values = c(Colombians = "black", Venezuelans = "#0072BC")) 
+
+plot
+```
+]
+
+--
+
+.pull-right[
+&lt;img src="presentation1_files/figure-html/unnamed-chunk-60-1.png" width="1080" /&gt;
+]
+
+???
+
+
+
+---
+
+### Change labels
 
 .pull-left[
 
@@ -1964,37 +2157,65 @@ rbm_indicators &lt;-
     rbm2.2 = "2.2 Proportion of PoCs residing in physically safe and secure settlements with access to basic facilities.",
     rbm2.3 = "2.3 Proportion of PoC with access to health services")
 
-ggplot( data = indicators,
-  aes(est, fct_rev(ind))) +
-  geom_pointrange(aes(xmin = est_low, 
-                      xmax = est_upp, 
-                      color = pop), 
-                  size = .75) +
-  geom_text(aes(label = scales::label_percent(.1)(est)), 
-                 vjust = -1.25) +
-  scale_x_continuous(labels = scales::label_percent(), 
-                     limits = c(0, 1), 
-                     breaks = c(0, .5, 1)) +
-  scale_y_discrete(labels = str_wrap(rev(rbm_indicators), 40)) +
-  scale_color_manual(values = c(Colombians = "black", Venezuelans = "#0072BC")) +
-  labs(x = "Estimate", y = "",
-       title = "Impact Area 2: Realizing Rights in Safe Environments",
-       caption = glue::glue("Encuesta Nacional de Calidad de Vida (ECV) 2020\n",
-                            "# of Venezuelans = {scales::label_comma()(sum(data$pop=='Venezuelans'))} obs. ",
-                            "({scales::label_number_si(.1)(sum((data$pop=='Venezuelans')*data$wt))} weighted)")) +
-  unhcRstyle::unhcr_theme(base = 8) +
-  theme(panel.grid.minor.x = element_blank())
+plot &lt;- plot +
+  scale_y_discrete(labels = str_wrap(rev(rbm_indicators), 40)) 
+plot
 ```
 ]
 
 --
 
 .pull-right[
-&lt;img src="presentation1_files/figure-html/unnamed-chunk-54-1.png" width="1080" /&gt;
+&lt;img src="presentation1_files/figure-html/unnamed-chunk-62-1.png" width="1080" /&gt;
 ]
 
 ???
 
+
+---
+
+### Title and Style
+
+.pull-left[
+
+
+```r
+plot &lt;- plot + 
+ labs(x = "Estimate", y = "",
+       title = "Impact Area 2: Realizing Rights in Safe Environments",
+       caption = glue::glue("Encuesta Nacional de Calidad de Vida (ECV) 2020\n",
+                            "# of Venezuelans = {scales::label_comma()(sum(data$pop=='Venezuelans'))} obs. ",
+                            "({scales::label_number_si(.1)(sum((data$pop=='Venezuelans')*data$wt))} weighted)")) +
+  unhcRstyle::unhcr_theme() +
+  theme(panel.grid.minor.x = element_blank())
+
+plot
+```
+]
+
+--
+
+.pull-right[
+&lt;img src="presentation1_files/figure-html/unnamed-chunk-64-1.png" width="1080" /&gt;
+]
+
+???
+
+---
+
+## Congrat!
+
+Today you learn the basics! 
+
+ * Objects are __words__
+ * Functions are __verbs__ used to transform object
+ * Charts are  __complement__ created with the __grammar__ of graphics
+
+???
+
+In grammar, a complement is a word, phrase, or clause that is necessary to complete the meaning of a given expression. Complements are often also arguments 
+
+---
 class: center, middle, inverse
 
 
@@ -2042,8 +2263,8 @@ class: left, top
 .pull-left[
 
 __DIMA Americas__: &lt;br&gt;
-Edouard Legoupil, _Snr Statistics &amp; Data Analysis Officer_, &lt;a href="mailto:legoupil@unhcr.org"&gt;&lt;i class="fa fa-paper-plane fa-fw"&gt;&lt;/i&gt;&amp;nbsp; legoupil@unhcr.org&lt;/a&gt; | &lt;a href="http://twitter.com/edouard_lgp"&gt;&lt;i class="fa fa-twitter fa-fw"&gt;&lt;/i&gt;&amp;nbsp; @edouard_lgp&lt;/a&gt; &lt;br&gt; 
-Hisham Galal, _Associate Statistics &amp; Data Analysis Officer_, &lt;a href="mailto:galal@unhcr.org"&gt;&lt;i class="fa fa-paper-plane fa-fw"&gt;&lt;/i&gt;&amp;nbsp; galal@unhcr.org&lt;/a&gt;
+Edouard Legoupil, _Snr Statistics &amp; Data Analysis Officer_,&lt;br&gt;  &lt;a href="mailto:legoupil@unhcr.org"&gt;&lt;i class="fa fa-paper-plane fa-fw"&gt;&lt;/i&gt;&amp;nbsp; legoupil@unhcr.org&lt;/a&gt;  &lt;br&gt; 
+Hisham Galal, _Associate Statistics &amp; Data Analysis Officer_,&lt;br&gt;  &lt;a href="mailto:galal@unhcr.org"&gt;&lt;i class="fa fa-paper-plane fa-fw"&gt;&lt;/i&gt;&amp;nbsp; galal@unhcr.org&lt;/a&gt;
 
 
 Check our github @ &lt;a href="http://github.com/unhcr-americas"&gt;&lt;i class="fa fa-github fa-fw"&gt;&lt;/i&gt;&amp;nbsp;unhcr-americas&lt;/a&gt;  and learn about __UnhcRverse packages__&lt;br&gt;
