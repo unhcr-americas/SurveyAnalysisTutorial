@@ -562,52 +562,51 @@ knitr::kable(head(unhcrdatapackage::reference %>% select(UNHCRBureau,iso_3, ctry
 
 ### Reshape the data - 2 - Filter
 
-.pull-left[
-```{r, comment='#'}
+
+```{r, comment='#', evaluate = FALSE}
+
+nrow(Origin) # Number of Rows before filter
+
+## Using Pipe (%>%) Operator
+# allows us to pass the result of one function/argument to the other one in sequence
+# assigning each functional output as an argument to the next one, and so on
 Origin <- Origin %>%
   filter( #<<
+    ## we will use the 4 filters below
     CountryAsylumName  == "Panama" & 
     UNHCRBureau == "Americas" &
     Year == max(unhcrdatapackage::end_year_population_totals_long$Year) &
     Population.type  %in%c("REF", "ASY", "VDA" ))
 
-```
-]
 
---
+nrow(Origin) # Checking Number of rows after filter
 
-.pull-right[
-```{r, echo=FALSE} 
-#knitr::kable(head(Origin), format = 'html')
-DT::datatable(Origin,
-  fillContainer = FALSE, options = list(pageLength = 4))
+
 ```
-]
+
 
 
 ---
 
 ### Reshape the data - 3 - Shorten country name
 
-.pull-left[
+
 ```{r, comment='#'}
+## Check what the potential value of CountryOriginName
+levels(Origin$CountryOriginName)
+## Changing to factor an display the last 10 values
+tail(levels(as.factor(Origin$CountryOriginName)),6)
+
 Origin <- Origin %>%  
   mutate( #<<
-    CountryOriginName = str_replace(CountryOriginName, " \\(Bolivarian Republic of\\)", "")) 
+    CountryOriginName = str_replace(CountryOriginName,
+                                    " \\(Bolivarian Republic of\\)", "")) 
+## We used a string replacement function
 
+## check replacement 
+tail(levels(as.factor(Origin$CountryOriginName)),4)
 ```
-]
 
---
-
-.pull-right[
-```{r, echo=FALSE}
-knitr::kable(head(Origin), format = 'html')
-
-#DT::datatable(head(Origin, 10),
-#  fillContainer = FALSE, options = list(pageLength = 4))
-```
-]
 
 ---
 
@@ -620,6 +619,8 @@ Origin <- Origin %>%
   group_by( CountryOriginName) %>% #<<
   summarise(DisplacedAcrossBorders = sum(Value) )  #<<
 
+
+### Explore the results in a filterable table
 # DT::datatable(Origin,
 #    fillContainer = FALSE, options = list(pageLength = 4))
 
@@ -646,9 +647,16 @@ DT::datatable(Origin,
 .pull-left[
 ```{r, comment='#'}
 Origin <- Origin %>%  
-  mutate( DisplacedAcrossBordersRound =  ifelse(DisplacedAcrossBorders > 1000, 
-                                                paste(scales::label_number_si(accuracy = 0.1)(DisplacedAcrossBorders)),
-                                                as.character(DisplacedAcrossBorders) ) ) 
+  
+  ## using the scales::label_number_si function #<<
+  ## but adding some accuracy needs to be corrected for values below 1000
+  mutate( DisplacedAcrossBordersRound =  
+            ## let do a test with ifelse
+            ifelse(DisplacedAcrossBorders > 1000, 
+            ## condition 1 - above 1000
+            paste(scales::label_number_si(accuracy = 0.1)(DisplacedAcrossBorders)),
+            ## condition 2 - below 1000
+            as.character(DisplacedAcrossBorders) ) ) 
 
 ```
 ]
@@ -657,7 +665,10 @@ Origin <- Origin %>%
 
 .pull-right[
 ```{r, echo=FALSE}
-knitr::kable(head(Origin), format = 'html')
+knitr::kable(Origin %>%  
+  arrange(desc(DisplacedAcrossBorders)) %>%
+    select(CountryOriginName,DisplacedAcrossBordersRound ) %>%
+  head(10), format = 'html')
 ```
 ]
 
@@ -669,8 +680,14 @@ knitr::kable(head(Origin), format = 'html')
 .pull-left[
 ```{r, comment='#'}
 Origin <- Origin %>%  
+  ## Sorting resulting by descending numbers
   arrange(desc(DisplacedAcrossBorders)) %>%
+  ## keep only the first 10 records
   head(10)
+
+## check results
+#knitr::kable(head(Origin %>%
+#    select(CountryOriginName,DisplacedAcrossBordersRound ),5 ), format = 'html')
 
 ```
 ]
@@ -679,7 +696,8 @@ Origin <- Origin %>%
 
 .pull-right[
 ```{r, echo=FALSE}
-knitr::kable(head(Origin), format = 'html')
+knitr::kable(head(Origin %>%
+    select(CountryOriginName,DisplacedAcrossBordersRound ),5 ), format = 'html')
 ```
 ]
 
@@ -689,14 +707,31 @@ knitr::kable(head(Origin), format = 'html')
 
 .pull-left[
 
+
 ```{r, eval=FALSE, comment='#'}
-plot <- ggplot(Origin, aes(x = reorder(CountryOriginName, DisplacedAcrossBorders), ## Reordering country by Value
-                   y = DisplacedAcrossBorders)) +
+## A chart is indeed an object
+
+## We create below a chart called plot using the basic ggplot function
+
+plot <- ggplot(data = Origin, 
+               
+               ## Construct aesthetic mappings of variables to the chart
+               aes(
+                 # Reordering country name by Value to avoid default alphabetical
+                 x = reorder(CountryOriginName, DisplacedAcrossBorders), 
+                 y = DisplacedAcrossBorders)) +
   
   # here we configure that it will be bar chart    
-  geom_bar(stat = "identity", 
-           position = "identity", 
+  geom_bar(
+           ## indicate how data should be summarised... 
+           # default behavior is to count the rows for each x value (i.e. stat = "count")
+           # stat = "identity" in geom_bar() tells ggplot2 to skip the aggregation
+           # aka you provided the y values - an alternative is to use geom_col
+           stat = "identity", 
+           ## indicate the color to use to fill the bar - unhcr blue obviously!
            fill = "#0072bc")  
+
+## Print the plot!!
 plot
 ```
 
@@ -719,6 +754,10 @@ plot
 
 ]
 
+
+???
+See full reference here https://ggplot2.tidyverse.org/reference/
+
 ---
 
 ### Build the chart - 2 - Format axis number
@@ -727,8 +766,14 @@ plot
 .pull-left[
 
 ```{r, eval=FALSE, comment='#'}
+
+## A plot is constructed through layered instruction - 
+# I can re-use the same plot object (here: plot) and add more instructions with a +
+
 plot <- plot + 
   scale_y_continuous( label = scales::label_number_si())
+
+## simply inputing the name of the object as a commend will print its status
 plot
 ```
 
@@ -1186,7 +1231,7 @@ https://www.pipinghotdata.com/posts/2020-12-23-leveraging-labelled-data-in-r/
 ### Get the data
 
 
-The dataset,  [Encuesta Nacional de Calidad de Vida ECV 2020, Colombia, DANE](http://microdatos.dane.gov.co/index.php/catalog/718/get_microdata) is available through a micro data library.  
+The dataset,  [Encuesta Nacional de Calidad de Vida ECV 2020, Colombia, DANE](http://microdatos.dane.gov.co/index.php/catalog/718/get_microdata) is available through a micro data library.  Download the data from [here]( https://unhcr365-my.sharepoint.com/:f:/g/personal/legoupil_unhcr_org/El_KBosz8pFJilV0mSYUXycBhXqXx2dXtGey4T3_R1L8pA?e=kFXm5U) to your "`data-raw`" folder within your project file
 
 .left-column[
 ```{r , eval=FALSE, comment='#'}
@@ -1546,6 +1591,50 @@ table(data$pop, useNA = "ifany")
  
 ---
 
+### Create Indicators - Proportion of PoC living below the national poverty line
+
+.pull-left[
+
+```{r , eval=FALSE, comment='#'}
+indicators <-   left_join(persons, households) %>% 
+  transmute(pop = case_when(is.na(P756S3) ~ "Colombians",
+                            P756S3 == "Venezuela" ~ "Venezuelans",
+                            TRUE ~ "Others"),
+            
+            # 2.1 Proportion of PoC living below the national poverty line
+            rbm2.1 = PERCAPITA < 327674,
+            dpto = "dummy", # FIXME: should be dwellings$dpto,
+            wt = FEX_C)   
+
+#knitr::kable(head(indicators %>%
+#                    select(pop, rbm2.1 )),
+#             format = 'html')
+```
+]
+
+--
+
+.pull-right[
+```{r , echo=FALSE}
+indicators <-   left_join(persons, households) %>% 
+  transmute(pop = case_when(is.na(P756S3) ~ "Colombians",
+                            P756S3 == "Venezuela" ~ "Venezuelans",
+                            TRUE ~ "Others"),
+            
+            # 2.1 Proportion of PoC living below the national poverty line
+            rbm2.1 = PERCAPITA < 327674,
+            dpto = "dummy", # FIXME: should be dwellings$dpto,
+            wt = FEX_C)  
+
+knitr::kable(head(indicators %>%
+                    select(pop, rbm2.1, rbm2.2, rbm2.3 )),
+             format = 'html')
+
+```
+]
+
+???
+
 ### Create Indicators
 
 .pull-left[
@@ -1621,6 +1710,85 @@ knitr::kable(head(indicators %>%
 ]
 
 ???
+
+
+### Create Indicators
+
+.pull-left[
+
+```{r , eval=FALSE, comment='#'}
+indicators <-   left_join(persons, households) %>% 
+  transmute(pop = case_when(is.na(P756S3) ~ "Colombians",
+                            P756S3 == "Venezuela" ~ "Venezuelans",
+                            TRUE ~ "Others"),
+            
+            # 2.1 Proportion of PoC living below the national poverty line
+            rbm2.1 = PERCAPITA < 327674, 
+            
+            water = P792 != "No tienen el servicio",
+            sanitation = P5032 != "No tienen el servicio",
+            overcrowding = CANT_PERSONAS_HOGAR/P5000 > 3,
+            secure_tenure = 
+              P5095 == "Propia, totalmente pagada" |
+              P5095 == "Propia, lo están pagando" |
+              (P5095 == "En arriendo o subarriendo" & P3006 == "Escrito"),
+            housing_durability = TRUE, # FIXME: correct when we get the missing data file
+       
+            # 2.2 Proportion of PoCs residing in physically safe and secure settlements 
+            # with access to basic facilities
+            rbm2.2 = water & sanitation & !overcrowding & housing_durability & secure_tenure,
+            
+            # 2.3 Proportion of PoC with access to health services
+            rbm2.3 = if_else(P5665 == "Sí", is.na(P6153), NA),
+            dpto = "dummy", # FIXME: should be dwellings$dpto,
+            wt = FEX_C)   
+
+#knitr::kable(head(indicators %>%
+#                    select(pop, rbm2.1, rbm2.2, rbm2.3 )),
+#             format = 'html')
+```
+]
+
+--
+
+.pull-right[
+```{r , echo=FALSE}
+indicators <-   left_join(persons, households) %>% 
+  transmute(pop = case_when(is.na(P756S3) ~ "Colombians",
+                            P756S3 == "Venezuela" ~ "Venezuelans",
+                            TRUE ~ "Others"),
+            
+            # 2.1 Proportion of PoC living below the national poverty line
+            rbm2.1 = PERCAPITA < 327674, 
+            
+            water = P792 != "No tienen el servicio",
+            sanitation = P5032 != "No tienen el servicio",
+            overcrowding = CANT_PERSONAS_HOGAR/P5000 > 3,
+            secure_tenure = 
+              P5095 == "Propia, totalmente pagada" |
+              P5095 == "Propia, lo están pagando" |
+              (P5095 == "En arriendo o subarriendo" & P3006 == "Escrito"),
+            housing_durability = TRUE, # FIXME: correct when we get the missing data file
+       
+            # 2.2 Proportion of PoCs residing in physically safe and secure settlements 
+            # with access to basic facilities
+            rbm2.2 = water & sanitation & !overcrowding & housing_durability & secure_tenure,
+            
+            # 2.3 Proportion of PoC with access to health services
+            rbm2.3 = if_else(P5665 == "Sí", is.na(P6153), NA),
+            dpto = "dummy", # FIXME: should be dwellings$dpto,
+            wt = FEX_C)  
+
+knitr::kable(head(indicators %>%
+                    select(pop, rbm2.1, rbm2.2, rbm2.3 )),
+             format = 'html')
+
+```
+]
+
+???
+  
+
  
 ---
 
@@ -1652,6 +1820,7 @@ indicators <-  indicators   %>%
 
 ```
 ]
+
 
 --
 
